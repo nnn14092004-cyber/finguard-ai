@@ -1,0 +1,34 @@
+services:
+  api-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: finguard_api_gateway
+    command: python -m uvicorn src.api.app:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONPATH=/app
+    restart: unless-stopped
+    networks:
+      - finguard_network
+
+  executive-dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: finguard_dashboard
+    command: streamlit run dashboard/app.py --server.port 8501 --server.address 0.0.0.0
+    ports:
+      - "8501:8501"
+    environment:
+      - PYTHONPATH=/app
+    depends_on:
+      - api-gateway
+    restart: unless-stopped
+    networks:
+      - finguard_network
+
+networks:
+  finguard_network:
+    driver: bridge

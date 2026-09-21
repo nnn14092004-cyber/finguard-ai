@@ -1,0 +1,20 @@
+{
+    "include": [
+        "src",
+        "tests",
+        "run_audit.py"
+    ],
+    "extraPaths": [
+        ".",
+        "src"
+    ],
+    "executionEnvironments": [
+        {
+            "root": ".",
+            "extraPaths": [
+                ".",
+                "src"
+            ]
+        }
+    ]
+}
