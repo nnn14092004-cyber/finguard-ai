@@ -1,7 +1,7 @@
 # FinGuard-AI: Automated Financial Regulatory Compliance & Contract Risk Audit Pipeline
 
-[![CI Pipeline](https://github.com/nnn14092004/finguard-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/nnn14092004/finguard-ai/actions/workflows/ci.yml)
-[![Pytest Coverage](https://img.shields.io/badge/Coverage-95%25-brightgreen.svg)](https://github.com/nnn14092004/finguard-ai)
+[![CI Pipeline](https://github.com/nnn14092004-cyber/finguard-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/nnn14092004-cyber/finguard-ai/actions/workflows/ci.yml)
+[![Pytest Coverage](https://img.shields.io/badge/Coverage-95%25-brightgreen.svg)](https://github.com/nnn14092004-cyber/finguard-ai)
 [![Python Version](https://img.shields.io/badge/Python-3.11%20%7C%203.12%20%7C%203.14-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg)](https://fastapi.tiangolo.com)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.40+-FF4B4B.svg)](https://streamlit.io)
