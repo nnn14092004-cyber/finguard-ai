@@ -1,12 +1,8 @@
-"""FastAPI Gateway Application for FinGuard-AI.
-
-Exposes RESTful endpoints for contract text and document file compliance auditing,
-health checks, root service discovery, and multi-dimensional financial risk scoring
-against international regulatory standards (FATF, SEC Howey, FTC Koscot, Unfair Terms).
-"""
+"""FastAPI REST gateway for FinGuard compliance auditing services."""
 
 from __future__ import annotations
 
+import logging
 from typing import Any, Dict
 from fastapi import FastAPI, File, HTTPException, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,10 +10,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.domain.models import AuditAssessmentReport, ContractAuditRequest
 from src.pipeline import FinGuardPipeline
 
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+logger = logging.getLogger("finguard.api")
+
 app = FastAPI(
-    title="FinGuard-AI Compliance & Regulatory Audit Gateway",
-    description="Automated multi-dimensional financial contract risk scoring and regulatory auditing engine.",
+    title="FinGuard Compliance Engine API",
     version="1.0.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
 )
 
 app.add_middleware(
@@ -31,29 +31,34 @@ app.add_middleware(
 pipeline_instance = FinGuardPipeline()
 
 
-@app.get("/", status_code=status.HTTP_200_OK, tags=["System"])
-async def root() -> Dict[str, Any]:
-    """Root service discovery endpoint exposing operational metadata and documentation links."""
+@app.get("/", tags=["Discovery"])
+def root() -> Dict[str, Any]:
+    """Returns service discovery metadata, navigation endpoints, and documentation links.
+
+    Returns:
+        Dictionary containing service identity, operational status, and endpoint paths.
+    """
     return {
-        "service": "FinGuard-AI Compliance & Regulatory Audit Gateway",
+        "service": "FinGuard-AI Regulatory Gateway",
         "version": "1.0.0",
         "status": "operational",
-        "documentation": {
-            "swagger_ui": "/docs",
-            "redoc": "/redoc",
-            "openapi_json": "/openapi.json",
-        },
+        "documentation": "/docs",
         "endpoints": {
-            "health_check": "/health",
+            "health": "/health",
             "audit_text": "/api/v1/audit/text",
             "audit_file": "/api/v1/audit/file",
+            "docs": "/docs",
         },
     }
 
 
-@app.get("/health", status_code=status.HTTP_200_OK, tags=["System"])
-async def health_check() -> Dict[str, Any]:
-    """Health check endpoint to verify gateway and sub-engine operational readiness."""
+@app.get("/health", tags=["Telemetry"])
+def health_check() -> Dict[str, str]:
+    """Returns operational health telemetry status.
+
+    Returns:
+        Dictionary reporting service status, version, and identity.
+    """
     return {
         "status": "healthy",
         "service": "FinGuard-AI Regulatory Gateway",
@@ -67,18 +72,28 @@ async def health_check() -> Dict[str, Any]:
     status_code=status.HTTP_200_OK,
     tags=["Audit"],
 )
-async def audit_text(request: ContractAuditRequest) -> AuditAssessmentReport:
-    """Audits raw contract or promotional text payload for regulatory violations."""
-    raw_content = request.content.strip()
-    if not raw_content:
+def audit_text(request: ContractAuditRequest) -> AuditAssessmentReport:
+    """Analyzes raw contract text and returns a comprehensive regulatory audit report.
+
+    Args:
+        request: Inbound audit payload containing contract text.
+
+    Returns:
+        AuditAssessmentReport containing findings, risk vector, and suspicion score.
+
+    Raises:
+        HTTPException: If payload content is blank or contains only whitespace.
+    """
+    if not request.content or not request.content.strip():
+        logger.warning("audit_text_rejected: empty request content")
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Contract content must not be blank or purely whitespace.",
+            detail="Contract content must contain substantive non-whitespace text.",
         )
-    return pipeline_instance.process_document(
-        raw_content,
-        file_name=request.document_title or "raw_contract_text.txt",
-    )
+
+    file_name = request.document_title or "contract_draft.txt"
+    logger.info("audit_text_started: document=%s length=%d", file_name, len(request.content))
+    return pipeline_instance.process_document(raw_text=request.content, file_name=file_name)
 
 
 @app.post(
@@ -87,32 +102,33 @@ async def audit_text(request: ContractAuditRequest) -> AuditAssessmentReport:
     status_code=status.HTTP_200_OK,
     tags=["Audit"],
 )
-async def audit_file(file: UploadFile = File(...)) -> AuditAssessmentReport:
-    """Accepts uploaded text or markdown files and executes end-to-end audit pipeline."""
+def audit_file(file: UploadFile = File(...)) -> AuditAssessmentReport:
+    """Analyzes an uploaded plain text contract file.
+
+    Args:
+        file: Multi-part form file upload stream.
+
+    Returns:
+        AuditAssessmentReport containing compliance assessment findings.
+
+    Raises:
+        HTTPException: If file is missing a filename or contains an empty payload.
+    """
     if not file.filename:
+        logger.warning("audit_file_rejected: missing filename")
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Uploaded file must have a valid filename.",
+            detail="Uploaded file must possess a valid filename.",
         )
 
-    file_bytes = await file.read()
-    if not file_bytes or not file_bytes.strip():
+    raw_bytes = file.file.read()
+    if not raw_bytes or not raw_bytes.strip():
+        logger.warning("audit_file_rejected: empty payload for %s", file.filename)
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Uploaded file content is empty.",
+            detail="Uploaded file content cannot be empty.",
         )
 
-    try:
-        decoded_text = file_bytes.decode("utf-8")
-    except UnicodeDecodeError:
-        decoded_text = file_bytes.decode("latin-1", errors="replace")
-
-    return pipeline_instance.process_document(
-        decoded_text,
-        file_name=file.filename,
-    )
-
-
-# Explicit function aliases for backward compatibility and test invocation
-audit_contract_text = audit_text
-audit_contract_file = audit_file
+    content = raw_bytes.decode("utf-8", errors="replace")
+    logger.info("audit_file_started: filename=%s size=%d", file.filename, len(raw_bytes))
+    return pipeline_instance.process_document(raw_text=content, file_name=file.filename)
