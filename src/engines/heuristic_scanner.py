@@ -1,42 +1,40 @@
-"""Deterministic Heuristic Scanner Engine for FinGuard-AI.
-
-Scans normalized financial contract payloads against compiled regulatory regex rules,
-extracting granular infringing clause findings and location spans.
-"""
+"""Deterministic regex scanning engine for codified regulatory rules."""
 
 from __future__ import annotations
 
 import re
-from typing import Any, List, Optional
-from src.domain.models import ClauseFinding, DocumentPayload, Finding
+from typing import List, Optional
+from src.domain.models import DocumentPayload, Finding
 from src.rules.catalog import RegulatoryCatalog, RegulatoryRule
 
 
 class HeuristicScanner:
-    """Engine executing deterministic pattern matching against codified regulatory rules."""
+    """Scans text payloads against compiled regulatory regex patterns."""
 
     def __init__(self, rules: Optional[List[RegulatoryRule]] = None) -> None:
-        self.rules: List[RegulatoryRule] = (
-            list(rules) if rules is not None else list(RegulatoryCatalog.get_rules())
-        )
+        if rules is not None:
+            self.rules: List[RegulatoryRule] = list(rules)
+        else:
+            self.rules: List[RegulatoryRule] = list(RegulatoryCatalog.get_rules())
 
     def scan(self, payload: DocumentPayload) -> List[Finding]:
-        """Scans contract payload text and returns all identified regulatory infractions."""
-        findings: List[Finding] = []
-        text: str = (
-            getattr(payload, "normalized_content", None)
-            or getattr(payload, "normalized_text", "")
-            or ""
-        )
+        """Executes regex pattern matching against document text.
 
-        if not text or not text.strip():
+        Args:
+            payload: Normalized document payload container.
+
+        Returns:
+            List of identified compliance findings.
+        """
+        findings: List[Finding] = []
+        text: str = payload.normalized_content or payload.normalized_text
+
+        if not text.strip():
             return findings
 
         for rule in self.rules:
-            raw_pattern = str(rule.pattern)
-            compiled_pattern = re.compile(raw_pattern, re.IGNORECASE)
-
-            for match in compiled_pattern.finditer(text):
+            pattern = re.compile(rule.pattern, re.IGNORECASE)
+            for match in pattern.finditer(text):
                 findings.append(
                     Finding(
                         rule_id=rule.rule_id,
