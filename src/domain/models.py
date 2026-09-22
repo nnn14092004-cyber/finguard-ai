@@ -1,132 +1,163 @@
-"""Domain Models and Data Contracts for FinGuard-AI.
+"""Domain Models and Data Transfer Objects for FinGuard-AI.
 
-Defines Pydantic V2 schemas for audit requests, violation findings,
-multi-dimensional risk vectors, scoring breakdowns, and comprehensive assessment reports.
+Defines defensive Pydantic V2 schemas for document ingestion payloads,
+codified statutory rules, granular heuristic and semantic audit findings,
+4D risk vectors, and executive compliance assessment reports.
 """
 
 from __future__ import annotations
 
 import uuid
-from typing import Any, List, Optional
-from pydantic import BaseModel, Field, model_validator
+from typing import Any, Dict, List, Optional
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from src.domain.enums import RegulatoryFramework, RiskSeverity, RiskTier
-
-
-class ClauseFinding(BaseModel):
-    """Deterministic violation identified via heuristic regex scanning."""
-
-    rule_id: str
-    rule_name: str
-    severity: RiskSeverity
-    weight: int
-    category: str
-    matched_text: str
-    start_index: int
-    end_index: int
-    regulatory_framework: RegulatoryFramework
-    remediation_advice: str
-
-
-class SemanticFinding(BaseModel):
-    """Contextual violation identified via deep NLP semantic analysis."""
-
-    clause_topic: str
-    deceptive_intent: str
-    extracted_text: str
-    implicit_risk_level: RiskSeverity
-    regulatory_relevance: RegulatoryFramework
-    confidence_score: float = Field(ge=0.0, le=1.0)
-
-
-class MultiDimensionalRiskVector(BaseModel):
-    """Multi-dimensional risk breakdown across key predatory domains."""
-
-    yield_risk: int = Field(default=0, ge=0, le=100)
-    structural_risk: int = Field(default=0, ge=0, le=100)
-    liquidity_risk: int = Field(default=0, ge=0, le=100)
-    legal_risk: int = Field(default=0, ge=0, le=100)
-
-
-# Defensive alias for flexible naming conventions
-RiskVector = MultiDimensionalRiskVector
-
-
-class ScoringBreakdown(BaseModel):
-    """Detailed audit metrics accounting for severity distribution and score caps."""
-
-    tier_1_critical_count: int = Field(default=0, ge=0)
-    tier_2_high_count: int = Field(default=0, ge=0)
-    tier_3_cautionary_count: int = Field(default=0, ge=0)
-    raw_score: int = Field(default=0, ge=0)
-    capped_score: int = Field(default=0, ge=0, le=100)
-
-
-class AuditAssessmentReport(BaseModel):
-    """Official FinGuard-AI compliance audit report."""
-
-    document_id: str
-    file_name: str
-    suspicion_score: int = Field(ge=0, le=100)
-    risk_tier: RiskTier
-    risk_vector: MultiDimensionalRiskVector
-    scoring_breakdown: ScoringBreakdown
-    total_findings: int
-    findings: List[ClauseFinding] = Field(default_factory=list)
-    semantic_findings: List[SemanticFinding] = Field(default_factory=list)
-    executive_summary: str
-    remediation_actions: List[str] = Field(default_factory=list)
-
-
-# Defensive aliases
-AuditReport = AuditAssessmentReport
-RuleFinding = ClauseFinding
-
-
-class ContractAuditRequest(BaseModel):
-    """Inbound REST API request payload for raw contract text auditing."""
-
-    document_title: str = Field(default="contract_draft.txt")
-    content: str = Field(min_length=1)
+from src.domain.enums import RegulatoryFramework, RiskSeverity, RiskTier, RuleSeverity, Severity
 
 
 class DocumentPayload(BaseModel):
-    """Internal document payload wrapper across ingestion, scanning, and pipeline."""
+    """Immutable contract payload container with dual-field compatibility."""
 
-    document_id: str = Field(default="")
-    file_name: str = "document.txt"
-    raw_content: str = ""
-    normalized_content: str = ""
-    character_count: int = 0
-    content: Optional[str] = None
+    document_id: str = Field(default_factory=lambda: str(uuid.uuid4()), description="Document unique identifier.")
+    file_name: str = Field(default="unnamed_document.txt", description="Originating filename or label.")
+    raw_text: str = Field(default="", description="Raw unnormalized textual contract input.")
+    normalized_text: str = Field(default="", description="Deobfuscated and Unicode NFKC normalized text.")
+    character_count: int = Field(default=0, ge=0, description="Normalized character length.")
+    metadata: Dict[str, Any] = Field(default_factory=dict, description="Arbitrary ingestion metadata.")
+
+    model_config = ConfigDict(populate_by_name=True, extra="allow")
 
     @model_validator(mode="before")
     @classmethod
-    def harmonize_payload_contracts(cls, data: Any) -> Any:
-        """Defensively bridges content and raw_content attributes across callers."""
+    def reconcile_field_aliases(cls, data: Any) -> Any:
+        """Harmonizes raw_content/raw_text and normalized_content/normalized_text transparently."""
         if isinstance(data, dict):
-            raw = data.get("raw_content") or data.get("content") or ""
-            norm = data.get("normalized_content") or raw
-            data.setdefault("raw_content", raw)
-            data.setdefault("content", raw)
-            data.setdefault("normalized_content", norm)
-            data.setdefault("character_count", len(norm))
-            if not data.get("document_id"):
-                data["document_id"] = str(uuid.uuid4())
-            data.setdefault("file_name", "document.txt")
+            if "raw_content" in data and not data.get("raw_text"):
+                data["raw_text"] = data["raw_content"]
+            elif "raw_text" in data and not data.get("raw_content"):
+                data["raw_content"] = data["raw_text"]
+
+            if "normalized_content" in data and not data.get("normalized_text"):
+                data["normalized_text"] = data["normalized_content"]
+            elif "normalized_text" in data and not data.get("normalized_content"):
+                data["normalized_content"] = data["normalized_text"]
+
+            if "character_count" not in data:
+                data["character_count"] = len(data.get("normalized_text", ""))
         return data
 
+    @property
+    def raw_content(self) -> str:
+        """Alias for raw_text for backward compatibility."""
+        return self.raw_text
 
-class RuleDefinition(BaseModel):
-    """Internal schema representing a codified regulatory heuristic rule."""
+    @property
+    def normalized_content(self) -> str:
+        """Alias for normalized_text for backward compatibility."""
+        return self.normalized_text
 
-    model_config = {"arbitrary_types_allowed": True}
 
-    rule_id: str
-    rule_name: str
-    severity: RiskSeverity
-    weight: int
-    category: str
-    pattern: Any
-    regulatory_framework: RegulatoryFramework
-    remediation_advice: str
+class RegulatoryRule(BaseModel):
+    """Codified compliance rule representing international statutory requirements."""
+
+    rule_id: str = Field(..., min_length=2, description="Canonical rule code (e.g., HOWEY-001).")
+    rule_name: str = Field(..., min_length=3, description="Descriptive regulatory violation title.")
+    category: str = Field(..., min_length=2, description="Infraction category.")
+    severity: Severity = Field(..., description="Penalty severity classification.")
+    regulatory_framework: RegulatoryFramework = Field(..., description="Governing regulatory authority.")
+    weight: int = Field(..., ge=0, le=40, description="Mathematical score weight contribution.")
+    pattern: str = Field(..., min_length=3, description="Compiled regular expression pattern.")
+    remediation_advice: str = Field(..., min_length=5, description="Actionable statutory remediation counsel.")
+
+    model_config = ConfigDict(populate_by_name=True, extra="allow")
+
+
+class Finding(BaseModel):
+    """Discrete heuristic violation discovered within an audited document."""
+
+    rule_id: str = Field(..., description="Canonical rule code of the triggered rule.")
+    rule_name: str = Field(default="", description="Descriptive violation title.")
+    severity: Severity = Field(default=Severity.MEDIUM, description="Severity classification tier.")
+    regulatory_framework: RegulatoryFramework = Field(default=RegulatoryFramework.UNFAIR_TERMS, description="Governing statutory doctrine.")
+    weight: int = Field(default=10, ge=0, le=40, description="Score penalty weight.")
+    matched_text: str = Field(default="", description="Verbatim infringing text extracted from document.")
+    category: str = Field(default="", description="Substantive risk classification category.")
+    remediation_advice: str = Field(default="", description="Statutory remediation guidance.")
+    start_index: int = Field(default=0, description="Zero-indexed start character offset.")
+    end_index: int = Field(default=0, description="Zero-indexed end character offset.")
+    span: Optional[Any] = Field(default=None, description="Exact document coordinates.")
+
+    model_config = ConfigDict(populate_by_name=True, extra="allow")
+
+    @property
+    def matched_clause(self) -> str:
+        """Alias for matched_text to maintain domain value object parity."""
+        return self.matched_text
+
+    @property
+    def remediation_guidance(self) -> str:
+        """Alias for remediation_advice to maintain domain value object parity."""
+        return self.remediation_advice
+
+
+class SemanticFinding(BaseModel):
+    """Contextual semantic finding produced by the NLP evasion auditor."""
+
+    rule_id: str = Field(default="SEM-001", description="Canonical semantic violation code.")
+    category: str = Field(default="Regulatory Risk", description="Regulatory risk domain classification.")
+    context_snippet: str = Field(default="", description="Contextual excerpt illustrating predatory intent.")
+    penalty_weight: int = Field(default=20, ge=0, le=40, description="Additive risk penalty.")
+    remediation_guidance: str = Field(default="", description="Actionable statutory compliance counsel.")
+    confidence_score: float = Field(default=0.90, ge=0.0, le=1.0, description="NLP model confidence.")
+
+    model_config = ConfigDict(populate_by_name=True, extra="allow")
+
+    @property
+    def matched_text(self) -> str:
+        return self.context_snippet
+
+    @property
+    def remediation_advice(self) -> str:
+        return self.remediation_guidance
+
+    @property
+    def weight(self) -> int:
+        return self.penalty_weight
+
+
+class MultiDimensionalRiskVector(BaseModel):
+    """Orthogonal 4D risk vector decomposing regulatory exposure across distinct axes."""
+
+    yield_risk: int = Field(..., ge=0, le=100, description="Velocity of promised yields and capital guarantees.")
+    structural_risk: int = Field(..., ge=0, le=100, description="Multi-tier recruitment, binary MLM, Howey pooling.")
+    liquidity_risk: int = Field(..., ge=0, le=100, description="Mandatory lock-ups, exit penalties, conditional liquidity.")
+    legal_risk: int = Field(..., ge=0, le=100, description="Offshore secrecy havens, unilateral modification rights.")
+
+
+class AuditAssessmentReport(BaseModel):
+    """Comprehensive compliance assessment report synthesized by the evaluation engine."""
+
+    document_id: str = Field(default_factory=lambda: str(uuid.uuid4()), description="Unique audit trace identifier.")
+    file_name: str = Field(..., description="Audited document filename.")
+    suspicion_score: int = Field(..., ge=0, le=100, description="Bounded scalar score S in [0, 100].")
+    risk_tier: RiskTier = Field(..., description="Governing risk tier classification.")
+    risk_vector: MultiDimensionalRiskVector = Field(..., description="Decomposed 4D risk vector.")
+    total_findings: int = Field(..., ge=0, description="Aggregate count of heuristic and semantic violations.")
+    findings: List[Finding] = Field(default_factory=list, description="Granular heuristic rule infractions.")
+    semantic_findings: List[Any] = Field(default_factory=list, description="Contextual NLP infractions.")
+    executive_summary: str = Field(..., description="Executive compliance narrative verdict.")
+    remediation_actions: List[str] = Field(default_factory=list, description="De-duplicated statutory remediation plan.")
+
+    model_config = ConfigDict(populate_by_name=True, extra="allow")
+
+
+class ContractAuditRequest(BaseModel):
+    """Inbound REST request schema for text compliance auditing."""
+
+    content: str = Field(..., min_length=1, description="Raw contract text or promotional draft.")
+    document_title: Optional[str] = Field(default="contract_draft.txt", description="Optional document label.")
+
+
+# Universal Type Aliases for Backward & Forward Compatibility
+ClauseFinding = Finding
+RuleDefinition = RegulatoryRule
+ComplianceFinding = Finding

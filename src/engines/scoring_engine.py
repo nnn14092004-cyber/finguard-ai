@@ -1,221 +1,226 @@
 """Mathematical Risk Scoring Engine for FinGuard-AI.
 
-Implements the multi-dimensional weighted scoring formula:
-    S = min(100, sum(w_i * c_i))
-and decomposes predatory patterns into a 4-dimensional regulatory risk vector
-(Yield Risk, Structural Risk, Liquidity Risk, Legal/Jurisdictional Risk)
-aligned with the FinGuard Global Knowledge Base.
+Synthesizes deterministic heuristic violations and contextual semantic audit findings
+into a normalized scalar Suspicion Score S in [0, 100], determines the governing RiskTier,
+and decomposes exposure into an orthogonal four-dimensional risk vector:
+(Yield Risk, Structural Risk, Liquidity Risk, Legal Risk).
 """
 
 from __future__ import annotations
 
-from typing import Any, List, Optional, Sequence
-
-from src.domain.enums import RegulatoryFramework, RiskSeverity, RiskTier
-from src.domain.models import (
-    AuditAssessmentReport,
-    ClauseFinding,
-    DocumentPayload,
-    MultiDimensionalRiskVector,
-    ScoringBreakdown,
-    SemanticFinding,
-)
+import uuid
+from typing import Any, Dict, List, Optional, Set
+from src.domain.enums import RegulatoryFramework, RiskTier, Severity
+from src.domain.models import AuditAssessmentReport, DocumentPayload, MultiDimensionalRiskVector
 
 
 class ScoringEngine:
-    """Calculates weighted suspicion metrics and maps findings to executive risk tiers."""
+    """Enterprise risk scoring matrix and assessment report synthesizer."""
+
+    def __init__(self) -> None:
+        self._red_flag_threshold: int = 75
+        self._orange_threshold: int = 50
+        self._yellow_threshold: int = 25
 
     @classmethod
     def evaluate(
         cls,
         payload: DocumentPayload,
-        *args: Any,
-        **kwargs: Any,
+        heuristic_findings: Optional[List[Any]] = None,
+        semantic_findings: Optional[List[Any]] = None,
+        findings: Optional[List[Any]] = None,
     ) -> AuditAssessmentReport:
-        """Consolidates findings into an authoritative AuditAssessmentReport.
+        """Unified class-level entry point supporting legacy callers and modern pipelines."""
+        engine = cls()
+        all_heuristic: List[Any] = []
+        if heuristic_findings is not None:
+            all_heuristic.extend(heuristic_findings)
+        if findings is not None:
+            all_heuristic.extend(findings)
 
-        Defensively supports multiple invocation signatures across pipeline callers
-        and unit test suites:
-            evaluate(payload, heuristic_findings, semantic_findings)
-            evaluate(payload, findings=..., semantic_findings=...)
-            evaluate(payload, heuristic_list)
-        """
-        # Resolve heuristic findings from args or kwargs
-        heuristic_findings: Sequence[ClauseFinding] = []
-        if args:
-            heuristic_findings = args[0]
-        elif "heuristic_findings" in kwargs:
-            heuristic_findings = kwargs["heuristic_findings"]
-        elif "findings" in kwargs:
-            heuristic_findings = kwargs["findings"]
-
-        # Resolve semantic findings from args or kwargs
-        semantic_findings: Sequence[SemanticFinding] = []
-        if len(args) > 1:
-            semantic_findings = args[1]
-        elif "semantic_findings" in kwargs:
-            semantic_findings = kwargs.get("semantic_findings") or []
-
-        t1_count = 0
-        t2_count = 0
-        t3_count = 0
-        raw_score = 0
-
-        # Heuristic findings aggregation
-        for h in heuristic_findings:
-            raw_score += h.weight
-            if h.severity == RiskSeverity.TIER_1_CRITICAL:
-                t1_count += 1
-            elif h.severity == RiskSeverity.TIER_2_HIGH:
-                t2_count += 1
-            elif h.severity == RiskSeverity.TIER_3_CAUTIONARY:
-                t3_count += 1
-
-        # Semantic findings aggregation
-        for s in semantic_findings:
-            if s.implicit_risk_level == RiskSeverity.TIER_1_CRITICAL:
-                raw_score += 40
-                t1_count += 1
-            elif s.implicit_risk_level == RiskSeverity.TIER_2_HIGH:
-                raw_score += 20
-                t2_count += 1
-            elif s.implicit_risk_level == RiskSeverity.TIER_3_CAUTIONARY:
-                raw_score += 10
-                t3_count += 1
-
-        capped_score = min(100, raw_score)
-        risk_tier = cls._determine_risk_tier(capped_score)
-        risk_vector = cls._calculate_risk_vector(heuristic_findings, semantic_findings)
-
-        remediation_actions = cls._synthesize_remediation(heuristic_findings, semantic_findings)
-        executive_summary = cls._generate_executive_summary(
-            payload.file_name, capped_score, risk_tier, t1_count, t2_count, t3_count
+        all_semantic = semantic_findings or []
+        return engine.synthesize_report(
+            file_name=getattr(payload, "file_name", "document.txt"),
+            findings=all_heuristic,
+            semantic_findings=all_semantic,
         )
 
-        return AuditAssessmentReport(
-            document_id=payload.document_id,
-            file_name=payload.file_name,
-            suspicion_score=capped_score,
-            risk_tier=risk_tier,
-            risk_vector=risk_vector,
-            scoring_breakdown=ScoringBreakdown(
-                tier_1_critical_count=t1_count,
-                tier_2_high_count=t2_count,
-                tier_3_cautionary_count=t3_count,
-                raw_score=raw_score,
-                capped_score=capped_score,
-            ),
-            total_findings=len(heuristic_findings) + len(semantic_findings),
-            findings=list(heuristic_findings),
-            semantic_findings=list(semantic_findings),
-            executive_summary=executive_summary,
-            remediation_actions=remediation_actions,
-        )
+    def compute_suspicion_score(
+        self,
+        findings: List[Any],
+        semantic_findings: List[Any],
+    ) -> int:
+        """Calculates bounded aggregate suspicion score: S = min(100, sum(w_i * c_i))."""
+        score: int = 0
+        seen_rules: Set[str] = set()
 
-    @staticmethod
-    def _determine_risk_tier(score: int) -> RiskTier:
-        """Maps quantitative score to statutory qualitative risk tier."""
-        if score >= 75:
+        for f in findings:
+            rule_id = getattr(f, "rule_id", "")
+            weight = getattr(f, "weight", 0)
+            if rule_id and rule_id not in seen_rules:
+                score += weight
+                seen_rules.add(rule_id)
+
+        for sf in semantic_findings:
+            penalty = getattr(sf, "penalty_weight", 0) or getattr(sf, "weight", 0)
+            score += penalty
+
+        return min(100, max(0, score))
+
+    def determine_risk_tier(self, score: int) -> RiskTier:
+        """Maps quantitative score to international regulatory classification tiers."""
+        if score >= self._red_flag_threshold:
             return RiskTier.RED_FLAG
-        if score >= 50:
+        if score >= self._orange_threshold:
             return RiskTier.ORANGE
-        if score >= 25:
+        if score >= self._yellow_threshold:
             return RiskTier.YELLOW
         return RiskTier.GREEN
 
-    @staticmethod
-    def _calculate_risk_vector(
-        heuristic_findings: Sequence[ClauseFinding],
-        semantic_findings: Sequence[SemanticFinding],
+    def compute_risk_vector(
+        self,
+        findings: List[Any],
+        semantic_findings: List[Any],
     ) -> MultiDimensionalRiskVector:
-        """Decomposes violations across Yield, Structural, Liquidity, and Legal axes."""
-        yield_pts = 0
-        struct_pts = 0
-        liq_pts = 0
-        legal_pts = 0
+        """Decomposes regulatory exposure into an orthogonal 4D risk vector."""
+        yield_score: int = 0
+        structural_score: int = 0
+        liquidity_score: int = 0
+        legal_score: int = 0
 
-        for h in heuristic_findings:
-            cat = (h.category or "").lower()
-            framework = h.regulatory_framework
+        rule_ids = {getattr(f, "rule_id", "") for f in findings}
 
-            if (
-                "yield" in cat
-                or "obfuscation" in cat
-                or framework == RegulatoryFramework.FATF_FCA_HYIP
-            ):
-                yield_pts += h.weight
-            elif (
-                "pyramid" in cat
-                or "recruit" in cat
-                or "securities" in cat
-                or "pay to play" in cat
-                or framework in [RegulatoryFramework.FTC_IOSCO_PYRAMID, RegulatoryFramework.SEC_HOWEY_DOCTRINE]
-            ):
-                struct_pts += h.weight
-            elif "liquidity" in cat or "lock" in cat:
-                liq_pts += h.weight
-            elif "jurisdiction" in cat or "manipulation" in cat or framework == RegulatoryFramework.UNFAIR_CONTRACT_TERMS:
-                legal_pts += h.weight
+        # 1. Yield Risk
+        if "HYIP-001" in rule_ids:
+            yield_score += 70
+        if "TECH-001" in rule_ids:
+            yield_score += 30
+        for f in findings:
+            framework = getattr(f, "regulatory_framework", None)
+            rule_id = getattr(f, "rule_id", "")
+            weight = getattr(f, "weight", 0)
+            category = str(getattr(f, "category", "")).upper()
+            if framework in {RegulatoryFramework.FATF_HYIP, RegulatoryFramework.FATF_FCA_HYIP} and rule_id not in {"HYIP-001", "TECH-001"}:
+                yield_score += weight
+            elif "YIELD" in category and rule_id not in {"HYIP-001", "TECH-001"}:
+                yield_score += weight
 
-        for s in semantic_findings:
-            topic = (s.clause_topic or "").lower()
-            relevance = s.regulatory_relevance
+        # 2. Structural Risk
+        if "HOWEY-001" in rule_ids:
+            structural_score += 40
+        if "PYR-001" in rule_ids or "PYRAMID-001" in rule_ids:
+            structural_score += 40
+        if "PYRAMID-002" in rule_ids:
+            structural_score += 20
+        for f in findings:
+            framework = getattr(f, "regulatory_framework", None)
+            rule_id = getattr(f, "rule_id", "")
+            weight = getattr(f, "weight", 0)
+            if framework in {RegulatoryFramework.SEC_HOWEY, RegulatoryFramework.FTC_KOSCOT}:
+                if rule_id not in {"HOWEY-001", "PYR-001", "PYRAMID-001", "PYRAMID-002"}:
+                    structural_score += weight
 
-            if "basis points" in topic or "yield" in topic or relevance == RegulatoryFramework.FATF_FCA_HYIP:
-                yield_pts += 40
-            elif "downside" in topic or "pyramid" in topic or relevance in [RegulatoryFramework.FTC_IOSCO_PYRAMID, RegulatoryFramework.SEC_HOWEY_DOCTRINE]:
-                struct_pts += 40
-            elif "liquidity" in topic:
-                liq_pts += 20
-            else:
-                legal_pts += 20
+        # 3. Liquidity Risk
+        if "LOCK-001" in rule_ids:
+            liquidity_score += 30
+        if "LOCK-002" in rule_ids:
+            liquidity_score += 30
+        for f in findings:
+            category = str(getattr(f, "category", "")).upper()
+            rule_id = getattr(f, "rule_id", "")
+            weight = getattr(f, "weight", 0)
+            if "LIQUIDITY" in category and rule_id not in {"LOCK-001", "LOCK-002"}:
+                liquidity_score += weight
+
+        # 4. Legal Risk
+        if "JUR-001" in rule_ids or "UNFAIR-004" in rule_ids:
+            legal_score += 20
+        if "UNFAIR-001" in rule_ids:
+            legal_score += 20
+        for f in findings:
+            category = str(getattr(f, "category", "")).upper()
+            rule_id = getattr(f, "rule_id", "")
+            weight = getattr(f, "weight", 0)
+            if ("JURISDICTION" in category or "ABUSIVE" in category or "LEGAL" in category) and rule_id not in {"JUR-001", "UNFAIR-004", "UNFAIR-001"}:
+                legal_score += weight
+
+        # Contextual semantic findings
+        for sf in semantic_findings:
+            category = str(getattr(sf, "category", "") or getattr(sf, "clause_topic", "")).upper()
+            penalty = getattr(sf, "penalty_weight", 0) or getattr(sf, "weight", 0) or 20
+            if "YIELD" in category:
+                yield_score += penalty
+            elif "STRUCTURE" in category or "HOWEY" in category or "PYRAMID" in category:
+                structural_score += penalty
+            elif "LIQUIDITY" in category or "LOCK" in category:
+                liquidity_score += penalty
+            elif "LEGAL" in category or "JURISDICTION" in category:
+                legal_score += penalty
 
         return MultiDimensionalRiskVector(
-            yield_risk=min(100, yield_pts),
-            structural_risk=min(100, struct_pts),
-            liquidity_risk=min(100, liq_pts),
-            legal_risk=min(100, legal_pts),
+            yield_risk=min(100, yield_score),
+            structural_risk=min(100, structural_score),
+            liquidity_risk=min(100, liquidity_score),
+            legal_risk=min(100, legal_score),
         )
 
-    @staticmethod
-    def _synthesize_remediation(
-        heuristic_findings: Sequence[ClauseFinding],
-        semantic_findings: Sequence[SemanticFinding],
-    ) -> List[str]:
-        """Synthesizes deduplicated corrective guidance strings."""
-        seen = set()
-        actions: List[str] = []
+    def synthesize_report(
+        self,
+        file_name: str,
+        findings: List[Any],
+        semantic_findings: List[Any],
+    ) -> AuditAssessmentReport:
+        """Synthesizes complete regulatory compliance report with remediation guidance."""
+        suspicion_score = self.compute_suspicion_score(findings, semantic_findings)
+        risk_tier = self.determine_risk_tier(suspicion_score)
+        risk_vector = self.compute_risk_vector(findings, semantic_findings)
 
-        for h in heuristic_findings:
-            if h.remediation_advice and h.remediation_advice not in seen:
-                seen.add(h.remediation_advice)
-                actions.append(h.remediation_advice)
+        total_findings = len(findings) + len(semantic_findings)
 
-        for s in semantic_findings:
-            if s.deceptive_intent and s.deceptive_intent not in seen:
-                seen.add(s.deceptive_intent)
-                actions.append(s.deceptive_intent)
-
-        # Statutory baseline recommendation when no predatory clauses are detected
-        if not actions:
-            actions.append(
-                "Document demonstrates standard commercial balance. Ensure periodic legal and counterparty compliance reviews."
+        if risk_tier == RiskTier.RED_FLAG:
+            summary = (
+                f"CRITICAL REGULATORY HAZARD DETECTED in '{file_name}'. Suspicion Score: {suspicion_score}/100. "
+                "Document exhibits severe compounding indicators of an unregistered investment syndicate, "
+                "untenable high-yield solicitation, and multi-tier recruitment architecture."
+            )
+        elif risk_tier == RiskTier.ORANGE:
+            summary = (
+                f"HIGH REGULATORY SUSPICION in '{file_name}'. Suspicion Score: {suspicion_score}/100. "
+                "Document contains predatory contractual clauses, excessive capital lock-ups, or offshore legal evasion."
+            )
+        elif risk_tier == RiskTier.YELLOW:
+            summary = (
+                f"CAUTIONARY COMPLIANCE REVIEW REQUIRED for '{file_name}'. Suspicion Score: {suspicion_score}/100. "
+                "Non-standard clauses identified requiring legal scrutiny prior to execution."
+            )
+        else:
+            summary = (
+                f"STANDARD COMMERCIAL CONTRACT PROFILE for '{file_name}'. Suspicion Score: {suspicion_score}/100. "
+                "Zero critical Ponzi, pyramid, or predatory regulatory infractions identified."
             )
 
-        return actions
+        remediation_set: Set[str] = set()
+        for f in findings:
+            advice = getattr(f, "remediation_advice", None) or getattr(f, "remediation_guidance", None)
+            if advice:
+                remediation_set.add(advice)
+        for sf in semantic_findings:
+            advice = getattr(sf, "remediation_guidance", None) or getattr(sf, "remediation_advice", None)
+            if advice:
+                remediation_set.add(advice)
 
-    @staticmethod
-    def _generate_executive_summary(
-        file_name: str,
-        score: int,
-        tier: RiskTier,
-        t1: int,
-        t2: int,
-        t3: int,
-    ) -> str:
-        """Generates a high-level executive audit summary."""
-        return (
-            f"Audit completed for '{file_name}'. Suspicion Score: {score}/100 ({tier.value}). "
-            f"Violations breakdown: {t1} Critical (Tier 1), {t2} High (Tier 2), {t3} Cautionary (Tier 3). "
-            f"Regulatory status: {'UNACCEPTABLE FINANCIAL RISK' if tier == RiskTier.RED_FLAG else 'CONDITIONAL RISK'}."
+        if not remediation_set:
+            remediation_set.add("No immediate statutory remediation required. Contract adheres to commercial baselines.")
+
+        return AuditAssessmentReport(
+            document_id=str(uuid.uuid4()),
+            file_name=file_name,
+            suspicion_score=suspicion_score,
+            risk_tier=risk_tier,
+            risk_vector=risk_vector,
+            total_findings=total_findings,
+            findings=findings,
+            semantic_findings=semantic_findings,
+            executive_summary=summary,
+            remediation_actions=sorted(list(remediation_set)),
         )

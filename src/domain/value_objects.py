@@ -1,8 +1,7 @@
 """Domain Enumerations for FinGuard-AI Regulatory Compliance Pipeline.
 
 Defines discrete regulatory jurisdictions, risk tiers, statutory frameworks,
-and violation severity penalty classifications across international benchmarks:
-FATF, U.S. SEC Howey Doctrine, FTC Koscot Pyramid Standard, and Unfair Terms.
+and violation severity penalty classifications.
 """
 
 from __future__ import annotations
@@ -20,32 +19,24 @@ class RiskTier(str, Enum):
 
 
 class RegulatoryFramework(str, Enum):
-    """Governing international financial regulatory bodies and statutory doctrines."""
+    """Governing international financial regulatory bodies and doctrines."""
 
     SEC_HOWEY = "SEC_HOWEY"              # U.S. Securities & Exchange Commission (Howey Doctrine)
-    HOWEY_TEST_SEC = "SEC_HOWEY"         # Backward compatibility alias for semantic auditor
     FTC_KOSCOT = "FTC_KOSCOT"            # Federal Trade Commission (Pyramid Scheme Test)
-    FTC_KOSCOT_PYRAMID = "FTC_KOSCOT"    # Backward compatibility alias
     FATF_HYIP = "FATF_HYIP"              # Financial Action Task Force (High-Yield Fraud)
-    FATF_FCA_HYIP = "FATF_HYIP"          # Backward compatibility alias for test suites
     FCA_UK = "FCA_UK"                    # UK Financial Conduct Authority (Consumer Protection)
     UNFAIR_TERMS = "UNFAIR_TERMS"        # Cross-Border Unfair Contract Terms Directive
-    UNFAIR_TERMS_ACT = "UNFAIR_TERMS"    # Backward compatibility alias for test suites
 
 
 class Severity(str, Enum):
     """Penalty weighting tiers mapped directly to statutory infraction severity."""
 
-    CRITICAL = "CRITICAL"
-    TIER_1_CRITICAL = "CRITICAL"         # +40 points: Guaranteed yields, binary MLM, unregistered securities
-    HIGH = "HIGH"
-    TIER_2_HIGH = "HIGH"                 # +20 points: Unilateral modification, predatory lock-up >12 months
-    MEDIUM = "MEDIUM"
-    TIER_3_CAUTIONARY = "MEDIUM"         # +10 points: Offshore secrecy haven jurisdiction, FOMO urgency
-    CAUTIONARY = "MEDIUM"
-    LOW = "LOW"
+    CRITICAL = "CRITICAL"        # +40 points: Guaranteed yields, binary MLM, unregistered securities
+    HIGH = "HIGH"                # +20 points: Unilateral modification, predatory lock-up >12 months
+    MEDIUM = "MEDIUM"            # +10 points: Offshore secrecy haven jurisdiction, FOMO urgency
+    LOW = "LOW"                  # Informational compliance notice
+    CAUTIONARY = "CAUTIONARY"    # Regulatory review notice
 
 
-# Universal Compatibility Aliases
-RiskSeverity = Severity
+# Backward compatibility alias for legacy heuristic engines
 RuleSeverity = Severity
