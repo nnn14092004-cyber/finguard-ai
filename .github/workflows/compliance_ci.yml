@@ -1,4 +1,4 @@
-name: FinGuard Institutional Compliance CI
+name: FinGuard Compliance CI
 
 on:
   push:
@@ -14,10 +14,37 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  regulatory-audit-test:
-    name: Run Statutory Compliance Audit Suite
+  lint:
+    name: Code Hygiene & Type Safety
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install linters and package dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff mypy
+          pip install -e .
+
+      - name: Run Ruff linter checks
+        run: ruff check src tests
+
+      - name: Run Mypy static type checker
+        run: mypy src
+
+  test:
+    name: Statutory Verification (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    needs: lint
 
     strategy:
       fail-fast: false
@@ -25,8 +52,7 @@ jobs:
         python-version: ["3.11", "3.12"]
 
     steps:
-      - name: Check out repository source
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
@@ -34,15 +60,10 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: "pip"
 
-      - name: Upgrade core build tooling
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip setuptools wheel
-
-      - name: Install dependencies and testing harnesses
-        run: |
           pip install -e ".[dev]"
-          pip install pypdf reportlab
 
-      - name: Execute Pytest verification suite
-        run: |
-          pytest -v --tb=short --cov=src --cov-report=term-missing tests/
+      - name: Run pytest test suite
+        run: pytest -v --tb=short --cov=src --cov-report=term-missing tests/
