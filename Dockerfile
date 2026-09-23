@@ -1,41 +1,53 @@
-﻿# Build Stage: Dependency compilation and isolation
+﻿# Stage 1: Build virtualenv with all compiled dependencies
 FROM python:3.12-slim AS builder
 
 WORKDIR /build
 
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Native toolchain for packages requiring C extension builds
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-COPY pyproject.toml requirements.txt ./
-RUN pip install --no-cache-dir --user -r requirements.txt
+# Keep isolated dependencies inside /opt/venv for clean multi-stage transfer
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 
-# Final Stage: Lean runtime environment
+COPY pyproject.toml requirements.txt ./
+RUN pip install --upgrade pip setuptools wheel && \
+    pip install -r requirements.txt
+
+# Stage 2: Lean production runtime
 FROM python:3.12-slim AS runner
 
 WORKDIR /app
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PYTHONPATH=/app \
-    PATH=/root/.local/bin:$PATH
+    PATH="/opt/venv/bin:$PATH" \
+    ENVIRONMENT=production
 
+# Lightweight curl binary required by container health probes
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /root/.local /root/.local
+COPY --from=builder /opt/venv /opt/venv
 
-# Copy source trees and configuration
-COPY src/ /app/src/
-COPY pyproject.toml /app/
+# Enforce least-privilege security policy (non-root execution)
+RUN groupadd -g 1000 finguard && \
+    useradd -u 1000 -g finguard -s /bin/bash -m finguard
 
-# Install the application package non-editable for production
-RUN pip install --no-cache-dir --no-deps .
+COPY --chown=finguard:finguard src/ /app/src/
+COPY --chown=finguard:finguard pyproject.toml README.md /app/
 
-# Create unprivileged application user
-RUN useradd -m -u 1000 finguard && \
-    chown -R finguard:finguard /app
+# Install local package into venv without re-fetching pinned dependencies
+RUN pip install --no-cache-dir --no-deps . && \
+    chown -R finguard:finguard /opt/venv /app
 
 USER finguard
 

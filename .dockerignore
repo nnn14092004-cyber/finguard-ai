@@ -1,12 +1,30 @@
-﻿.venv
-venv
-__pycache__
-*.pyc
-*.pyo
-*.pyd
+﻿# Version Control & Environments
 .git
 .gitignore
+.github
+.venv
+venv/
+ENV/
+env/
+
+# Python Bytecode & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
 .coverage
-.pytest_cache
-batch_audit_summary.json
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# Local Configurations & Secrets
+.env
 *.log
+
+# IDE & OS Metadata
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
