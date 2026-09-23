@@ -1,4 +1,4 @@
-"""Mathematical Risk Scoring Engine for FinGuard-AI.
+"""Mathematical Risk Scoring Engine for FinGuard.
 
 Synthesizes deterministic heuristic violations and contextual semantic audit findings
 into a normalized scalar Suspicion Score S in [0, 100], determines the governing RiskTier,
@@ -9,8 +9,10 @@ and decomposes exposure into an orthogonal four-dimensional risk vector:
 from __future__ import annotations
 
 import uuid
-from typing import Any, Dict, List, Optional, Set
-from src.domain.enums import RegulatoryFramework, RiskTier, Severity
+from typing import Any, List, Optional, Set
+
+from src.core.config import get_settings
+from src.domain.enums import RegulatoryFramework, RiskTier
 from src.domain.models import AuditAssessmentReport, DocumentPayload, MultiDimensionalRiskVector
 
 
@@ -18,9 +20,16 @@ class ScoringEngine:
     """Enterprise risk scoring matrix and assessment report synthesizer."""
 
     def __init__(self) -> None:
-        self._red_flag_threshold: int = 75
-        self._orange_threshold: int = 50
-        self._yellow_threshold: int = 25
+        """Initializes regulatory scoring thresholds with centralized settings fallback."""
+        try:
+            settings = get_settings()
+            self._red_flag_threshold: int = settings.RED_FLAG_THRESHOLD
+            self._orange_threshold: int = settings.ORANGE_FLAG_THRESHOLD
+            self._yellow_threshold: int = settings.YELLOW_FLAG_THRESHOLD
+        except Exception:
+            self._red_flag_threshold = 75
+            self._orange_threshold = 50
+            self._yellow_threshold = 25
 
     @classmethod
     def evaluate(
@@ -50,7 +59,7 @@ class ScoringEngine:
         findings: List[Any],
         semantic_findings: List[Any],
     ) -> int:
-        """Calculates bounded aggregate suspicion score: S = min(100, sum(w_i * c_i))."""
+        """Calculates bounded aggregate suspicion score: S = min(100, max(0, sum(w_i * c_i)))."""
         score: int = 0
         seen_rules: Set[str] = set()
 
@@ -89,6 +98,7 @@ class ScoringEngine:
         legal_score: int = 0
 
         rule_ids = {getattr(f, "rule_id", "") for f in findings}
+        fatf_fca = getattr(RegulatoryFramework, "FATF_FCA_HYIP", RegulatoryFramework.FATF_HYIP)
 
         # 1. Yield Risk
         if "HYIP-001" in rule_ids:
@@ -100,7 +110,7 @@ class ScoringEngine:
             rule_id = getattr(f, "rule_id", "")
             weight = getattr(f, "weight", 0)
             category = str(getattr(f, "category", "")).upper()
-            if framework in {RegulatoryFramework.FATF_HYIP, RegulatoryFramework.FATF_FCA_HYIP} and rule_id not in {"HYIP-001", "TECH-001"}:
+            if framework in {RegulatoryFramework.FATF_HYIP, fatf_fca} and rule_id not in {"HYIP-001", "TECH-001"}:
                 yield_score += weight
             elif "YIELD" in category and rule_id not in {"HYIP-001", "TECH-001"}:
                 yield_score += weight
@@ -141,7 +151,9 @@ class ScoringEngine:
             category = str(getattr(f, "category", "")).upper()
             rule_id = getattr(f, "rule_id", "")
             weight = getattr(f, "weight", 0)
-            if ("JURISDICTION" in category or "ABUSIVE" in category or "LEGAL" in category) and rule_id not in {"JUR-001", "UNFAIR-004", "UNFAIR-001"}:
+            if (
+                "JURISDICTION" in category or "ABUSIVE" in category or "LEGAL" in category
+            ) and rule_id not in {"JUR-001", "UNFAIR-004", "UNFAIR-001"}:
                 legal_score += weight
 
         # Contextual semantic findings

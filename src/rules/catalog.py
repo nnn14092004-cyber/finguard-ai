@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from typing import Any, Iterator, List, Optional
 from src.domain.enums import RegulatoryFramework, RuleSeverity, Severity
-from src.domain.models import RegulatoryRule, RuleDefinition
+from src.domain.models import RegulatoryRule
 
 # Synchronize severity references for defensive compatibility
 _CRITICAL = getattr(Severity, "CRITICAL", RuleSeverity.CRITICAL)
@@ -215,4 +215,8 @@ class RegulatoryCatalog(metaclass=RegulatoryCatalogMeta):
 RULES = REGULATORY_RULE_CATALOG
 rules_catalog = REGULATORY_RULE_CATALOG
 get_rules = RegulatoryCatalog.get_rules
-get_catalog = lambda: RegulatoryCatalog()
+
+
+def get_catalog() -> RegulatoryCatalog:
+    """Factory function returning a RegulatoryCatalog instance."""
+    return RegulatoryCatalog()

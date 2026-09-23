@@ -1,4 +1,4 @@
-"""Pytest fixtures providing standardized synthetic contracts for FinGuard-AI tests."""
+"""Pytest fixtures providing standardized synthetic contracts for FinGuard tests."""
 
 from __future__ import annotations
 
@@ -78,6 +78,12 @@ def obfuscated_scam_contract() -> str:
 
 
 @pytest.fixture
+def blank_contract() -> str:
+    """Returns a boundary test fixture containing only whitespace."""
+    return "   \n\t  \r\n   "
+
+
+@pytest.fixture
 def create_payload() -> Callable[[str, str], DocumentPayload]:
     """Factory fixture generating valid DocumentPayload instances."""
     def _factory(raw_text: str, file_name: str = "test_document.txt") -> DocumentPayload:
@@ -89,4 +95,5 @@ def create_payload() -> Callable[[str, str], DocumentPayload]:
             normalized_content=normalized,
             character_count=len(normalized),
         )
+
     return _factory
