@@ -1,9 +1,4 @@
-"""Domain Enumerations for FinGuard-AI Regulatory Compliance Pipeline.
-
-Defines discrete regulatory jurisdictions, risk tiers, statutory frameworks,
-and violation severity penalty classifications across international benchmarks:
-FATF, U.S. SEC Howey Doctrine, FTC Koscot Pyramid Standard, and Unfair Terms.
-"""
+"""Statutory enumeration types for FinGuard-AI compliance auditing."""
 
 from __future__ import annotations
 
@@ -13,41 +8,59 @@ from enum import Enum
 class RiskTier(str, Enum):
     """Aggregate risk classification tiers based on computed suspicion score."""
 
-    GREEN = "GREEN"  # 0 - 24 points: Standard commercial contract
-    YELLOW = "YELLOW"  # 25 - 49 points: Cautionary / Unbalanced clauses
-    ORANGE = "ORANGE"  # 50 - 74 points: High suspicion / Predatory patterns
-    RED_FLAG = "RED_FLAG"  # 75 - 100 points: Critical Ponzi / Scam / Illegal scheme
+    GREEN = "GREEN"
+    YELLOW = "YELLOW"
+    ORANGE = "ORANGE"
+    RED = "RED"
 
-
-class RegulatoryFramework(str, Enum):
-    """Governing international financial regulatory bodies and statutory doctrines."""
-
-    SEC_HOWEY = "SEC_HOWEY"  # U.S. Securities & Exchange Commission (Howey Doctrine)
-    HOWEY_TEST_SEC = "SEC_HOWEY"  # Backward compatibility alias for semantic auditor
-    FTC_KOSCOT = "FTC_KOSCOT"  # Federal Trade Commission (Pyramid Scheme Test)
-    FTC_KOSCOT_PYRAMID = "FTC_KOSCOT"  # Backward compatibility alias
-    FATF_HYIP = "FATF_HYIP"  # Financial Action Task Force (High-Yield Fraud)
-    FATF_FCA_HYIP = "FATF_HYIP"  # Backward compatibility alias for test suites
-    FCA_UK = "FCA_UK"  # UK Financial Conduct Authority (Consumer Protection)
-    UNFAIR_TERMS = "UNFAIR_TERMS"  # Cross-Border Unfair Contract Terms Directive
-    UNFAIR_TERMS_ACT = "UNFAIR_TERMS"  # Backward compatibility alias for test suites
+    # Backward compatibility aliases
+    RED_FLAG = "RED"
+    CRITICAL = "RED"
 
 
 class Severity(str, Enum):
     """Penalty weighting tiers mapped directly to statutory infraction severity."""
 
-    CRITICAL = "CRITICAL"
-    TIER_1_CRITICAL = (
-        "CRITICAL"  # +40 points: Guaranteed yields, binary MLM, unregistered securities
-    )
-    HIGH = "HIGH"
-    TIER_2_HIGH = "HIGH"  # +20 points: Unilateral modification, predatory lock-up >12 months
-    MEDIUM = "MEDIUM"
-    TIER_3_CAUTIONARY = "MEDIUM"  # +10 points: Offshore secrecy haven jurisdiction, FOMO urgency
-    CAUTIONARY = "MEDIUM"
     LOW = "LOW"
+    MEDIUM = "MEDIUM"
+    HIGH = "HIGH"
+    CRITICAL = "CRITICAL"
+
+    # Backward compatibility aliases for statutory penalty tiers
+    TIER_1_CRITICAL = "CRITICAL"
+    TIER_2_HIGH = "HIGH"
+    TIER_3_CAUTIONARY = "MEDIUM"
+    TIER_3_CAUTION = "MEDIUM"
+    TIER_3_MEDIUM = "MEDIUM"
+    TIER_4_LOW = "LOW"
+    CAUTIONARY = "MEDIUM"
+    CAUTION = "MEDIUM"
 
 
-# Universal Compatibility Aliases
 RiskSeverity = Severity
 RuleSeverity = Severity
+
+
+class RegulatoryFramework(str, Enum):
+    """Governing international financial regulatory bodies and statutory doctrines."""
+
+    HOWEY_TEST = "HOWEY_TEST"
+    SEC_HOWEY = "HOWEY_TEST"
+    HOWEY = "HOWEY_TEST"
+
+    FTC_KOSCOT = "FTC_KOSCOT"
+    FTC_PYRAMID = "FTC_KOSCOT"
+    KOSCOT = "FTC_KOSCOT"
+    PYRAMID = "FTC_KOSCOT"
+
+    FATF_HYIP = "FATF_HYIP"
+    FATF_FCA_HYIP = "FATF_HYIP"
+    FATF = "FATF_HYIP"
+
+    UNFAIR_TERMS = "UNFAIR_TERMS"
+    UNFAIR = "UNFAIR_TERMS"
+    UNFAIR_TERMS_ACT = "UNFAIR_TERMS"
+
+    JURISDICTION_EVASION = "JURISDICTION_EVASION"
+    JURISDICTION_LAUNDERING = "JURISDICTION_EVASION"
+    JURISDICTION = "JURISDICTION_EVASION"

@@ -49,7 +49,7 @@ REGULATORY_RULE_CATALOG: list[RegulatoryRule] = [
             r"(?i)\bcompletely\s+passive\b",
             r"(?i)\bno\s*trading\s*expertise\s*(?:is\s*)?required\b",
             r"(?i)\bpool(?:ed|ing)?\s*(?:of\s*)?(?:investor\s*)?(?:funds?|capital)\b",
-            r"(?i)\b(?:allocate|allocating)\s*funds\b",
+            r"(?i)\b(?:allocate|allocating)\s*(?:digital\s*)?(?:funds?|capital|liquidity)\b",
             r"(?i)\bhandled\s*entirely\s*by\s*our\b",
             r"(?i)\bfully\s*managed\s*by\b",
             r"(?i)\befforts\s*of\s*(?:others|third\s*parties|promoters?|management)\b",
@@ -73,9 +73,10 @@ REGULATORY_RULE_CATALOG: list[RegulatoryRule] = [
         patterns=[
             r"(?i)\bmulti-tier\s*(?:referral|affiliate|downline|commission)\b",
             r"(?i)\bdownline(?:\s*investment)?(?:\s*volume)?\s*bonus(?:es)?\b",
-            r"(?i)\bbinary\s*(?:leg|bonus|tree|matrix)\b",
+            r"(?i)\bmatching\s*(?:downline\s*)?referral\s*bonus\b",
+            r"(?i)\bbinary\s*(?:legs?|bonus|tree|matrix)\b",
             r"(?i)\bcommission\s*on\s*level\s*\d+\s*downline\b",
-            r"(?i)\bmatching\s*bonus\s*across\s*\d+\s*generations?\b",
+            r"(?i)\bmatching\s*bonus\s*across\s*(?:binary\s*legs|\d+\s*generations?)\b",
             r"(?i)\brecruited\s*capital\b",
             r"(?i)\bgenerations?\s*(?:commission|matching\s*bonus)\b",
         ],
@@ -141,10 +142,13 @@ REGULATORY_RULE_CATALOG: list[RegulatoryRule] = [
         regulatory_framework=RegulatoryFramework.UNFAIR_TERMS,
         weight=20,
         patterns=[
-            r"(?i)\bmandatory\s*lock-?up\s*period\s*of\s*(?:1[2-9]|[2-9]\d+)\s*months?\b",
-            r"(?i)\bcapital\s*(?:frozen|locked)\s*for\s*(?:1[2-9]|[2-9]\d+)\s*months?\b",
-            r"(?i)\block-?up\s*interval\s*exceeding\s*365\s*days\b",
-            r"(?i)\block-?up\s*period\s*of\s*\d+\s*months\b",
+            r"(?i)\b(?:mandatory\s*)?(?:1[2-9]|[2-9]\d+)[-\s]*months?\s*(?:mandatory\s*)?lock[\s-]?up(?:\s*period)?\b",
+            r"(?i)\bmandatory\s*lock[\s-]?up\s*period\s*of\s*(?:1[2-9]|[2-9]\d+)\s*months?\b",
+            r"(?i)\block[\s-]?up\s*(?:period\s*)?(?:of\s*|for\s*)?(?:1[2-9]|[2-9]\d+)\s*months?\b",
+            r"(?i)\bcapital\s*(?:frozen|locked)\s*(?:for\s*)?(?:1[2-9]|[2-9]\d+)\s*months?\b",
+            r"(?i)\block[\s-]?up\s*interval\s*exceeding\s*365\s*days\b",
+            r"(?i)\block[\s-]?up\s*period\s*of\s*\d+\s*months\b",
+            r"(?i)\bmandatory\s*(?:1[2-9]|[2-9]\d+)[-\s]*months?\s*lock[\s-]?up\b",
         ],
         remediation_advice=(
             "Restrict capital lock-up horizons to commercially reasonable liquidity windows "
@@ -159,12 +163,15 @@ REGULATORY_RULE_CATALOG: list[RegulatoryRule] = [
         regulatory_framework=RegulatoryFramework.UNFAIR_TERMS,
         weight=20,
         patterns=[
+            r"(?i)\bearly\s*(?:withdrawal|exit|redemption)\b.{0,50}?(?:strips?|incurs?|deducts?|penalt(?:y|ies))\s*(?:of\s*)?(?:[3-9]\d|100)%",
+            r"(?i)\bearly\s*(?:withdrawal|exit|redemption)\b.{0,50}?(?:[3-9]\d|100)%\s*(?:penalty|fee)?",
+            r"(?i)\b(?:strips?|incurs?|deducts?)\s*(?:[3-9]\d|100)%\s*(?:penalty|fee)?",
             r"(?i)\bearly\s*(?:withdrawal|exit|redemption)\s*(?:penalty|fee)\b",
             r"(?i)\bearly\s*withdrawal\s*penalty\s*fees\b",
-            r"(?i)\bwithdrawal\s*fee\s*strips\s*(?:[3-9]\d|100)%\b",
+            r"(?i)\bwithdrawal\s*fee\s*strips\s*(?:[3-9]\d|100)%",
             r"(?i)\bforfeiture\s*of\s*(?:initial\s*)?principal\s*upon\s*early\s*exit\b",
-            r"(?i)\bpenalty\s*(?:fees\s*)?strip[s]?\s*\d+%\b",
-            r"(?i)\bpenalty\s*of\s*\d+%\b",
+            r"(?i)\bpenalty\s*(?:fees\s*)?strip[s]?\s*\d+%",
+            r"(?i)\bpenalty\s*of\s*\d+%",
         ],
         remediation_advice=(
             "Cap early liquidation fees strictly to verified administrative expenses (<= 3%) "
@@ -217,13 +224,15 @@ REGULATORY_RULE_CATALOG: list[RegulatoryRule] = [
         regulatory_framework=RegulatoryFramework.FATF_HYIP,
         weight=20,
         patterns=[
-            r"(?i)\bautonomous\s*(?:liquidity|arbitrage|neural)\s*matrix\b",
+            r"(?i)\bautonomous\s*(?:liquidity|arbitrage|neural)\b",
+            r"(?i)\balgorithmic\s*arbitrage\b",
             r"(?i)\bquantum\s*(?:vault|arbitrage|ai\s*engine)\b",
             r"(?i)\bcomplete\s*insulation\s*from\s*(?:downside|market|principal)\s*volatility\b",
-            r"(?i)\balgorithmic\s*distribution\s*without\s*market\s*risk\b",
-            r"(?i)\b100%\s*capital\s*protection\b",
+            r"(?i)\balgorithmic\s*distribution\s*(?:benchmark|without\s*market\s*risk)?\b",
             r"(?i)\bwealth\s*system\b",
-            r"(?i)\balgorithmic\s*arbitrage\b",
+            r"(?i)\b100%\s*capital\s*protection\b",
+            r"(?i)autonomous\s*(?:liquidity|arbitrage)",
+            r"(?i)algorithmic\s*distribution\s*benchmark",
         ],
         remediation_advice=(
             "Publish certified mathematical audit whitepapers detailing execution mechanics "

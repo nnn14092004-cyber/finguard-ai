@@ -80,3 +80,24 @@ class TestFinGuardPipelineE2E:
         assert report.suspicion_score == 0
         assert report.risk_tier == RiskTier.GREEN
         assert report.total_findings == 0
+
+    def test_e2e_predatory_arbitrage_syndicate_full_risk_vector(
+        self, pipeline: FinGuardPipeline
+    ) -> None:
+        """Verifies complete 4D risk vector calculation on synthetic syndicated scam contract."""
+        contract_text = (
+            "Participants allocate digital liquidity to our autonomous neural arbitrage syndicate. "
+            "We guarantee 2.5% daily yield with complete insulation from downside volatility. "
+            "Earn 10% matching downline referral bonus across binary legs. "
+            "Mandatory 18-month lock-up period applies. Any early withdrawal strips 40% penalty fee. "
+            "Governed by the laws of Vanuatu."
+        )
+
+        report = pipeline.process_document(contract_text, file_name="predatory_syndicate.txt")
+
+        assert report.suspicion_score == 100
+        assert report.risk_tier in (RiskTier.RED, RiskTier.RED_FLAG)
+        assert report.risk_vector.yield_risk == 100
+        assert report.risk_vector.structural_risk >= 40
+        assert report.risk_vector.liquidity_risk == 60
+        assert report.risk_vector.legal_risk >= 20

@@ -21,7 +21,7 @@ def test_semantic_auditor_handles_empty_input() -> None:
 def test_semantic_auditor_fallback_detects_obfuscated_terms() -> None:
     """Verifies heuristic fallback catches sophisticated technological obfuscation."""
     auditor = SemanticAuditor()
-    auditor.api_key = ""  # Force fallback path
+    auditor.api_key = ""
 
     obfuscated_contract = (
         "Participants allocate digital liquidity to our autonomous neural arbitrage syndicate. "

@@ -128,9 +128,7 @@ class SemanticFinding(BaseModel):
         if not self.matched_text:
             self.matched_text = text
 
-        remediation = (
-            self.remediation_guidance or self.remediation_advice or self.deceptive_intent
-        )
+        remediation = self.remediation_guidance or self.remediation_advice or self.deceptive_intent
         if not self.remediation_guidance:
             self.remediation_guidance = remediation
         if not self.remediation_advice:

@@ -17,8 +17,7 @@ class HeuristicScanner:
             list(rules) if rules is not None else get_catalog().get_rules()
         )
         self._compiled_patterns: list[tuple[RegulatoryRule, list[re.Pattern[str]]]] = [
-            (rule, [re.compile(p, re.IGNORECASE) for p in rule.patterns])
-            for rule in self.rules
+            (rule, [re.compile(p, re.IGNORECASE) for p in rule.patterns]) for rule in self.rules
         ]
 
     def scan(self, payload: DocumentPayload) -> list[Finding]:
