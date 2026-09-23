@@ -9,7 +9,7 @@ and decomposes exposure into an orthogonal four-dimensional risk vector:
 from __future__ import annotations
 
 import uuid
-from typing import Any, List, Optional, Set
+from typing import Any
 
 from src.core.config import get_settings
 from src.domain.enums import RegulatoryFramework, RiskTier
@@ -35,13 +35,13 @@ class ScoringEngine:
     def evaluate(
         cls,
         payload: DocumentPayload,
-        heuristic_findings: Optional[List[Any]] = None,
-        semantic_findings: Optional[List[Any]] = None,
-        findings: Optional[List[Any]] = None,
+        heuristic_findings: list[Any] | None = None,
+        semantic_findings: list[Any] | None = None,
+        findings: list[Any] | None = None,
     ) -> AuditAssessmentReport:
         """Unified class-level entry point supporting legacy callers and modern pipelines."""
         engine = cls()
-        all_heuristic: List[Any] = []
+        all_heuristic: list[Any] = []
         if heuristic_findings is not None:
             all_heuristic.extend(heuristic_findings)
         if findings is not None:
@@ -56,12 +56,12 @@ class ScoringEngine:
 
     def compute_suspicion_score(
         self,
-        findings: List[Any],
-        semantic_findings: List[Any],
+        findings: list[Any],
+        semantic_findings: list[Any],
     ) -> int:
         """Calculates bounded aggregate suspicion score: S = min(100, max(0, sum(w_i * c_i)))."""
         score: int = 0
-        seen_rules: Set[str] = set()
+        seen_rules: set[str] = set()
 
         for f in findings:
             rule_id = getattr(f, "rule_id", "")
@@ -88,8 +88,8 @@ class ScoringEngine:
 
     def compute_risk_vector(
         self,
-        findings: List[Any],
-        semantic_findings: List[Any],
+        findings: list[Any],
+        semantic_findings: list[Any],
     ) -> MultiDimensionalRiskVector:
         """Decomposes regulatory exposure into an orthogonal 4D risk vector."""
         yield_score: int = 0
@@ -110,7 +110,10 @@ class ScoringEngine:
             rule_id = getattr(f, "rule_id", "")
             weight = getattr(f, "weight", 0)
             category = str(getattr(f, "category", "")).upper()
-            if framework in {RegulatoryFramework.FATF_HYIP, fatf_fca} and rule_id not in {"HYIP-001", "TECH-001"}:
+            if framework in {RegulatoryFramework.FATF_HYIP, fatf_fca} and rule_id not in {
+                "HYIP-001",
+                "TECH-001",
+            }:
                 yield_score += weight
             elif "YIELD" in category and rule_id not in {"HYIP-001", "TECH-001"}:
                 yield_score += weight
@@ -179,8 +182,8 @@ class ScoringEngine:
     def synthesize_report(
         self,
         file_name: str,
-        findings: List[Any],
-        semantic_findings: List[Any],
+        findings: list[Any],
+        semantic_findings: list[Any],
     ) -> AuditAssessmentReport:
         """Synthesizes complete regulatory compliance report with remediation guidance."""
         suspicion_score = self.compute_suspicion_score(findings, semantic_findings)
@@ -211,18 +214,24 @@ class ScoringEngine:
                 "Zero critical Ponzi, pyramid, or predatory regulatory infractions identified."
             )
 
-        remediation_set: Set[str] = set()
+        remediation_set: set[str] = set()
         for f in findings:
-            advice = getattr(f, "remediation_advice", None) or getattr(f, "remediation_guidance", None)
+            advice = getattr(f, "remediation_advice", None) or getattr(
+                f, "remediation_guidance", None
+            )
             if advice:
                 remediation_set.add(advice)
         for sf in semantic_findings:
-            advice = getattr(sf, "remediation_guidance", None) or getattr(sf, "remediation_advice", None)
+            advice = getattr(sf, "remediation_guidance", None) or getattr(
+                sf, "remediation_advice", None
+            )
             if advice:
                 remediation_set.add(advice)
 
         if not remediation_set:
-            remediation_set.add("No immediate statutory remediation required. Contract adheres to commercial baselines.")
+            remediation_set.add(
+                "No immediate statutory remediation required. Contract adheres to commercial baselines."
+            )
 
         return AuditAssessmentReport(
             document_id=str(uuid.uuid4()),
@@ -234,5 +243,5 @@ class ScoringEngine:
             findings=findings,
             semantic_findings=semantic_findings,
             executive_summary=summary,
-            remediation_actions=sorted(list(remediation_set)),
+            remediation_actions=sorted(remediation_set),
         )

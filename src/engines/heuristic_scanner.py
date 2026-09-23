@@ -1,69 +1,48 @@
-"""Deterministic regex scanning engine for codified regulatory rules."""
+"""Deterministic regex scanner executing statutory pattern evaluation."""
 
 from __future__ import annotations
 
 import re
-from typing import List, Optional, Pattern, Tuple
 
 from src.domain.models import DocumentPayload, Finding
-from src.rules.catalog import RegulatoryCatalog, RegulatoryRule
+from src.rules.catalog import RegulatoryRule, get_catalog
 
 
 class HeuristicScanner:
-    """Scans text payloads against pre-compiled regulatory regex patterns."""
+    """Pre-compiled statutory regular expression inspection engine."""
 
-    def __init__(self, rules: Optional[List[RegulatoryRule]] = None) -> None:
-        """Initializes scanner and pre-compiles regex patterns for low-latency execution."""
-        if rules is not None:
-            self.rules: List[RegulatoryRule] = list(rules)
-        else:
-            self.rules: List[RegulatoryRule] = list(RegulatoryCatalog.get_rules())
-
-        # Pre-compile regex patterns during initialization to preserve < 0.45s latency benchmark
-        self._compiled_rules: List[Tuple[RegulatoryRule, Pattern[str]]] = [
-            (
-                rule,
-                rule.pattern
-                if isinstance(rule.pattern, re.Pattern)
-                else re.compile(rule.pattern, re.IGNORECASE),
-            )
+    def __init__(self, rules: list[RegulatoryRule] | None = None) -> None:
+        """Initializes scanner with cached pre-compiled regex automata."""
+        self.rules: list[RegulatoryRule] = (
+            list(rules) if rules is not None else get_catalog().get_rules()
+        )
+        self._compiled_patterns: list[tuple[RegulatoryRule, list[re.Pattern[str]]]] = [
+            (rule, [re.compile(p, re.IGNORECASE) for p in rule.patterns])
             for rule in self.rules
         ]
 
-    def scan(self, payload: DocumentPayload) -> List[Finding]:
-        """Executes regex pattern matching against document text.
+    def scan(self, payload: DocumentPayload) -> list[Finding]:
+        """Scans ingested contract payload against codified statutory patterns."""
+        target_text = payload.normalized_text or payload.raw_text
+        if not target_text or not target_text.strip():
+            return []
 
-        Args:
-            payload: Normalized document payload container.
-
-        Returns:
-            List of identified compliance findings.
-        """
-        findings: List[Finding] = []
-        text: str = (
-            getattr(payload, "normalized_content", None)
-            or getattr(payload, "normalized_text", "")
-            or ""
-        )
-
-        if not text.strip():
-            return findings
-
-        for rule, pattern in self._compiled_rules:
-            for match in pattern.finditer(text):
-                findings.append(
-                    Finding(
-                        rule_id=rule.rule_id,
-                        rule_name=rule.rule_name,
-                        severity=rule.severity,
-                        regulatory_framework=rule.regulatory_framework,
-                        weight=rule.weight,
-                        matched_text=match.group(0),
-                        category=rule.category,
-                        remediation_advice=rule.remediation_advice,
-                        start_index=match.start(),
-                        end_index=match.end(),
+        findings: list[Finding] = []
+        for rule, patterns in self._compiled_patterns:
+            for pattern in patterns:
+                for match in pattern.finditer(target_text):
+                    findings.append(
+                        Finding(
+                            rule_id=rule.rule_id,
+                            rule_name=rule.rule_name,
+                            severity=rule.severity,
+                            regulatory_framework=rule.regulatory_framework,
+                            weight=rule.weight,
+                            matched_text=match.group(0),
+                            category=rule.category,
+                            remediation_advice=rule.remediation_advice,
+                            start_index=match.start(),
+                            end_index=match.end(),
+                        )
                     )
-                )
-
         return findings
