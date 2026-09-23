@@ -87,7 +87,7 @@ def audit_text(request: ContractAuditRequest) -> AuditAssessmentReport:
     if not request.content or not request.content.strip():
         logger.warning("audit_text_rejected: empty request content")
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Contract content must contain substantive non-whitespace text.",
         )
 
@@ -117,7 +117,7 @@ def audit_file(file: UploadFile = File(...)) -> AuditAssessmentReport:
     if not file.filename:
         logger.warning("audit_file_rejected: missing filename")
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Uploaded file must possess a valid filename.",
         )
 
@@ -125,7 +125,7 @@ def audit_file(file: UploadFile = File(...)) -> AuditAssessmentReport:
     if not raw_bytes or not raw_bytes.strip():
         logger.warning("audit_file_rejected: empty payload for %s", file.filename)
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Uploaded file content cannot be empty.",
         )
 

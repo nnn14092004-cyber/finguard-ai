@@ -1,34 +1,47 @@
+version: "3.8"
+
+networks:
+  finguard-network:
+    driver: bridge
+
 services:
-  api-gateway:
+  api:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: finguard_api_gateway
-    command: python -m uvicorn src.api.app:app --host 0.0.0.0 --port 8000
+    container_name: finguard-api-gateway
+    restart: unless-stopped
+    command: ["uvicorn", "src.api.app:app", "--host", "0.0.0.0", "--port", "8000"]
     ports:
       - "8000:8000"
     environment:
-      - PYTHONPATH=/app
-    restart: unless-stopped
+      - ENVIRONMENT=production
+      - LOG_LEVEL=INFO
+      - PYTHONUNBUFFERED=1
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     networks:
-      - finguard_network
+      - finguard-network
 
-  executive-dashboard:
+  dashboard:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: finguard_dashboard
-    command: streamlit run dashboard/app.py --server.port 8501 --server.address 0.0.0.0
+    container_name: finguard-executive-cockpit
+    restart: unless-stopped
+    command: ["streamlit", "run", "src/ui/dashboard.py", "--server.port=8501", "--server.address=0.0.0.0"]
     ports:
       - "8501:8501"
     environment:
-      - PYTHONPATH=/app
+      - ENVIRONMENT=production
+      - LOG_LEVEL=INFO
+      - PYTHONUNBUFFERED=1
     depends_on:
-      - api-gateway
-    restart: unless-stopped
+      api:
+        condition: service_healthy
     networks:
-      - finguard_network
-
-networks:
-  finguard_network:
-    driver: bridge
+      - finguard-network
