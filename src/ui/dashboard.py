@@ -4,13 +4,14 @@ from __future__ import annotations
 
 import pathlib
 import sys
+from typing import Dict, Tuple
 
 # Ensure repository root is on sys.path for standalone Streamlit execution
 ROOT_DIR = pathlib.Path(__file__).resolve().parent.parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from typing import Dict, Tuple
+import plotly.graph_objects as go
 import streamlit as st
 
 from src.domain.enums import RiskTier
@@ -84,6 +85,7 @@ def configure_page_layout() -> None:
     """Configures Streamlit page metadata and layout parameters."""
     st.set_page_config(
         page_title="FinGuard Compliance Auditing Cockpit",
+        page_icon="🛡️",
         layout="wide",
         initial_sidebar_state="expanded",
     )
@@ -232,28 +234,135 @@ def render_executive_metrics(report: AuditAssessmentReport) -> None:
         )
 
 
+def build_risk_radar_chart(report: AuditAssessmentReport) -> go.Figure:
+    """Constructs an institutional 4D polar radar chart for decomposed risk vectors."""
+    categories = [
+        "Yield Velocity Risk",
+        "Structural / MLM Risk",
+        "Liquidity Lockup Risk",
+        "Legal Jurisdiction Risk",
+    ]
+    v = report.risk_vector
+    values = [
+        float(v.yield_risk),
+        float(v.structural_risk),
+        float(v.liquidity_risk),
+        float(v.legal_risk),
+    ]
+
+    # Close the radar loop
+    categories_closed = categories + [categories[0]]
+    values_closed = values + [values[0]]
+    baseline_safe = [25.0, 25.0, 25.0, 25.0, 25.0]
+
+    tier_color = TIER_COLORS.get(report.risk_tier, "#EF4444")
+    fill_rgba = (
+        "rgba(239, 68, 68, 0.45)"
+        if report.risk_tier == RiskTier.RED_FLAG
+        else (
+            "rgba(249, 115, 22, 0.45)"
+            if report.risk_tier == RiskTier.ORANGE
+            else (
+                "rgba(245, 158, 11, 0.40)"
+                if report.risk_tier == RiskTier.YELLOW
+                else "rgba(16, 185, 129, 0.35)"
+            )
+        )
+    )
+
+    fig = go.Figure()
+
+    # Statutory Commercial Safe Baseline Envelope (<= 25%)
+    fig.add_trace(
+        go.Scatterpolar(
+            r=baseline_safe,
+            theta=categories_closed,
+            fill="toself",
+            fillcolor="rgba(16, 185, 129, 0.08)",
+            line=dict(color="#10B981", width=1.5, dash="dash"),
+            name="Safe Commercial Threshold (<= 25%)",
+            hoverinfo="text",
+            hovertext="Statutory Baseline Ceiling (25%)",
+        )
+    )
+
+    # Assessed Contract Risk Polygon
+    fig.add_trace(
+        go.Scatterpolar(
+            r=values_closed,
+            theta=categories_closed,
+            fill="toself",
+            fillcolor=fill_rgba,
+            line=dict(color=tier_color, width=3.0),
+            name=f"Assessed Risk Vector ({report.risk_tier.value})",
+            hoverinfo="r+theta",
+        )
+    )
+
+    fig.update_layout(
+        polar=dict(
+            radialaxis=dict(
+                visible=True,
+                range=[0, 100],
+                tickvals=[25, 50, 75, 100],
+                ticktext=["25%", "50%", "75%", "100%"],
+                tickfont=dict(size=10, color="#94A3B8"),
+                gridcolor="#334155",
+                linecolor="#475569",
+            ),
+            angularaxis=dict(
+                tickfont=dict(size=11, color="#F1F5F9", family="sans-serif"),
+                gridcolor="#334155",
+                linecolor="#475569",
+            ),
+            bgcolor="rgba(15, 23, 42, 0.65)",
+        ),
+        showlegend=True,
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=-0.28,
+            xanchor="center",
+            x=0.5,
+            font=dict(size=11, color="#CBD5E1"),
+        ),
+        margin=dict(l=40, r=40, t=25, b=45),
+        paper_bgcolor="rgba(0, 0, 0, 0)",
+        plot_bgcolor="rgba(0, 0, 0, 0)",
+        height=380,
+    )
+    return fig
+
+
 def render_risk_vector_telemetry(report: AuditAssessmentReport) -> None:
-    """Renders decomposed orthogonal risk axes."""
+    """Renders decomposed orthogonal risk axes with interactive Plotly Radar Chart."""
     st.subheader("Orthogonal Regulatory Risk Decomposition")
     v = report.risk_vector
 
-    c1, c2, c3, c4 = st.columns(4)
-    with c1:
+    radar_col, bar_col = st.columns([1.25, 1.0], gap="large")
+
+    with radar_col:
+        radar_fig = build_risk_radar_chart(report)
+        st.plotly_chart(radar_fig, use_container_width=True)
+
+    with bar_col:
+        st.markdown("<div style='padding-top: 10px;'></div>", unsafe_allow_html=True)
+
         st.caption("YIELD VELOCITY RISK")
         st.progress(v.yield_risk / 100.0)
-        st.write(f"**{v.yield_risk}%** - Guaranteed Yields")
-    with c2:
+        st.write(f"**{v.yield_risk}%** - Guaranteed Yields & FATF HYIP Benchmarks")
+
         st.caption("STRUCTURAL / MLM RISK")
         st.progress(v.structural_risk / 100.0)
-        st.write(f"**{v.structural_risk}%** - Pooling & Multi-Tier")
-    with c3:
+        st.write(f"**{v.structural_risk}%** - SEC Howey Pooling & FTC Koscot Multi-Tier")
+
         st.caption("LIQUIDITY LOCKUP RISK")
         st.progress(v.liquidity_risk / 100.0)
-        st.write(f"**{v.liquidity_risk}%** - Exit Barriers & Penalties")
-    with c4:
+        st.write(f"**{v.liquidity_risk}%** - Capital Freezes & Exit Penalties")
+
         st.caption("LEGAL JURISDICTION RISK")
         st.progress(v.legal_risk / 100.0)
-        st.write(f"**{v.legal_risk}%** - Secrecy Venues & Waivers")
+        st.write(f"**{v.legal_risk}%** - Offshore Secrecy Venues & Abusive Terms")
 
 
 def render_audit_details(report: AuditAssessmentReport) -> None:
