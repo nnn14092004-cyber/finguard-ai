@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import uuid
-import pytest
-from src.domain.enums import RegulatoryFramework, RiskSeverity, RiskTier, Severity
-from src.domain.models import ClauseFinding, DocumentPayload, Finding
+
+from src.domain.enums import RegulatoryFramework, RiskSeverity, RiskTier
+from src.domain.models import ClauseFinding, DocumentPayload
 from src.engines.scoring_engine import ScoringEngine
 
 
@@ -147,8 +147,6 @@ def test_scoring_engine_deduplicates_remediation_actions() -> None:
         remediation_advice="Do not invest in fixed daily returns.",
     )
 
-    report = ScoringEngine.evaluate(
-        payload, findings=[repeated_finding_a, repeated_finding_b]
-    )
+    report = ScoringEngine.evaluate(payload, findings=[repeated_finding_a, repeated_finding_b])
 
     assert report.remediation_actions.count("Do not invest in fixed daily returns.") == 1

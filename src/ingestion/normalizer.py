@@ -15,9 +15,7 @@ class TextNormalizer:
     """Sanitizes, unescapes, and de-obfuscates text extracted from investment agreements."""
 
     # Matches single-character spacing within a word: e.g., 'g u a r a n t e e d' -> 'guaranteed'
-    _SPACED_LETTERS_PATTERN: Final[re.Pattern[str]] = re.compile(
-        r"(?<=\b[a-zA-Z]) (?=[a-zA-Z]\b)"
-    )
+    _SPACED_LETTERS_PATTERN: Final[re.Pattern[str]] = re.compile(r"(?<=\b[a-zA-Z]) (?=[a-zA-Z]\b)")
 
     # Matches spaced percentage/number patterns: e.g., '1 0 0 %' -> '100%', '1 . 5 %' -> '1.5%'
     _SPACED_NUMBERS_PATTERN: Final[re.Pattern[str]] = re.compile(

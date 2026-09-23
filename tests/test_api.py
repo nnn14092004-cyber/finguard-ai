@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 import io
+
 from fastapi.testclient import TestClient
 
 from src.api.app import app
 from src.domain.enums import RiskTier
-from src.domain.models import ContractAuditRequest
 
 client = TestClient(app)
 
@@ -72,9 +72,7 @@ def test_api_audit_file_upload() -> None:
         b"Governed by Delaware state law."
     )
 
-    files = {
-        "file": ("enterprise_agreement.txt", io.BytesIO(contract_bytes), "text/plain")
-    }
+    files = {"file": ("enterprise_agreement.txt", io.BytesIO(contract_bytes), "text/plain")}
     response = client.post("/api/v1/audit/file", files=files)
     assert response.status_code == 200
     data = response.json()
@@ -85,8 +83,6 @@ def test_api_audit_file_upload() -> None:
 
 def test_api_audit_file_empty_rejection() -> None:
     """Verifies that zero-byte uploaded file is rejected with 422."""
-    files = {
-        "file": ("empty.txt", io.BytesIO(b""), "text/plain")
-    }
+    files = {"file": ("empty.txt", io.BytesIO(b""), "text/plain")}
     response = client.post("/api/v1/audit/file", files=files)
     assert response.status_code == 422

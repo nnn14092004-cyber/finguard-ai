@@ -8,7 +8,6 @@ and regulatory financial normalization (e.g., basis points conversion, Howey pro
 from __future__ import annotations
 
 import re
-from typing import List, Optional, Tuple
 
 from src.domain.enums import RegulatoryFramework, RiskSeverity
 from src.domain.models import DocumentPayload, SemanticFinding
@@ -17,7 +16,7 @@ from src.domain.models import DocumentPayload, SemanticFinding
 class SemanticAuditor:
     """Evaluates nuanced linguistic context and structural evasions in financial documents."""
 
-    def __init__(self, api_key: Optional[str] = None) -> None:
+    def __init__(self, api_key: str | None = None) -> None:
         """Initializes the semantic auditor with optional API configuration.
 
         Args:
@@ -25,7 +24,7 @@ class SemanticAuditor:
         """
         self._api_key = api_key
 
-    def audit(self, payload: DocumentPayload) -> List[SemanticFinding]:
+    def audit(self, payload: DocumentPayload) -> list[SemanticFinding]:
         """Performs deep contextual semantic analysis across document sentences.
 
         Args:
@@ -39,7 +38,7 @@ class SemanticAuditor:
             return []
 
         sentences = self._segment_into_sentences(text)
-        findings: List[SemanticFinding] = []
+        findings: list[SemanticFinding] = []
 
         for sentence in sentences:
             # Inspection Pillar 1: Veiled Yield & Basis Points Decoupling (FATF / FCA Standards)
@@ -60,23 +59,31 @@ class SemanticAuditor:
         return findings
 
     @staticmethod
-    def _segment_into_sentences(text: str) -> List[str]:
+    def _segment_into_sentences(text: str) -> list[str]:
         """Segments raw normalized content into discrete sentence-level audit units."""
         raw_sentences = re.split(r"(?<=[.!?])\s+|\n+", text)
         return [s.strip() for s in raw_sentences if len(s.strip()) > 15]
 
     @staticmethod
-    def _evaluate_veiled_yield(sentence: str) -> Optional[SemanticFinding]:
+    def _evaluate_veiled_yield(sentence: str) -> SemanticFinding | None:
         """Detects institutional jargon masking high-yield investment programs (HYIP).
 
         Translates basis points (bps) into annualized velocity to evaluate decoupling.
         Benchmark: 100 bps = 1.0%. Yields > 15-20% APR or any daily rate trigger FATF alerts.
         """
-        bps_match = re.search(r"(\d+)\s*(?:basis\s+points?|bps)\b.{0,30}?\b(daily|per\s+day|monthly)", sentence, re.IGNORECASE)
+        bps_match = re.search(
+            r"(\d+)\s*(?:basis\s+points?|bps)\b.{0,30}?\b(daily|per\s+day|monthly)",
+            sentence,
+            re.IGNORECASE,
+        )
         if bps_match:
             bps_value = int(bps_match.group(1))
             frequency = bps_match.group(2).lower()
-            daily_pct = (bps_value / 100.0) if "day" in frequency or "daily" in frequency else (bps_value / 100.0) / 30.0
+            daily_pct = (
+                (bps_value / 100.0)
+                if "day" in frequency or "daily" in frequency
+                else (bps_value / 100.0) / 30.0
+            )
             annualized_yield = daily_pct * 365.0
 
             return SemanticFinding(
@@ -113,7 +120,7 @@ class SemanticAuditor:
         return None
 
     @staticmethod
-    def _evaluate_veiled_howey(sentence: str) -> Optional[SemanticFinding]:
+    def _evaluate_veiled_howey(sentence: str) -> SemanticFinding | None:
         """Detects attempts to evade SEC Howey Test classifications."""
         passive_pattern = re.search(
             r"\b(?:passive\s+participants?|no\s+trading\s+expertise\s+(?:is\s+)?required|hands[- ]free)\b",
@@ -143,7 +150,7 @@ class SemanticAuditor:
         return None
 
     @staticmethod
-    def _evaluate_capital_insulation(sentence: str) -> Optional[SemanticFinding]:
+    def _evaluate_capital_insulation(sentence: str) -> SemanticFinding | None:
         """Detects zero-downside or risk-free capital preservation assertions."""
         insulation_pattern = re.search(
             r"\b(?:insulation\s+from\s+downside|complete\s+capital\s+protection|principal\s+is\s+insulated|zero\s+loss\s+safeguard)\b",

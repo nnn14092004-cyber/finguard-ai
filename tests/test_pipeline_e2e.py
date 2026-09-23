@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+
 from src.domain.enums import RiskTier
 from src.pipeline import FinGuardPipeline
 
@@ -16,9 +17,7 @@ def pipeline() -> FinGuardPipeline:
 class TestFinGuardPipelineE2E:
     """End-to-end integration test suite exercising the complete compliance workflow."""
 
-    def test_e2e_scam_contract_aura_neural_protocol(
-        self, pipeline: FinGuardPipeline
-    ) -> None:
+    def test_e2e_scam_contract_aura_neural_protocol(self, pipeline: FinGuardPipeline) -> None:
         """Verifies synthetic predatory contract triggers RED_FLAG tier and high risk vector."""
         malicious_contract = """
         AURA NEURAL PROTOCOL:
@@ -60,9 +59,7 @@ class TestFinGuardPipelineE2E:
         assert report.suspicion_score < 25
         assert len(report.findings) == 0
 
-    def test_e2e_howey_passive_reliance_detection(
-        self, pipeline: FinGuardPipeline
-    ) -> None:
+    def test_e2e_howey_passive_reliance_detection(self, pipeline: FinGuardPipeline) -> None:
         """Verifies SEC Howey Test Prong 4 (Derived Solely from Efforts of Others)."""
         howey_text = (
             "Investors provide capital into our collective pooling vault. "
@@ -76,9 +73,7 @@ class TestFinGuardPipelineE2E:
         rule_ids = {f.rule_id for f in report.findings}
         assert "HOWEY-001" in rule_ids
 
-    def test_e2e_empty_and_whitespace_input_resilience(
-        self, pipeline: FinGuardPipeline
-    ) -> None:
+    def test_e2e_empty_and_whitespace_input_resilience(self, pipeline: FinGuardPipeline) -> None:
         """Verifies defensive handling of blank or whitespace input strings."""
         report = pipeline.process_document("   \n\t   ", file_name="empty.txt")
 

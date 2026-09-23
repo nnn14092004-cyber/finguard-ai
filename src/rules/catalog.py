@@ -10,7 +10,9 @@ Codifies international financial compliance doctrines:
 from __future__ import annotations
 
 import re
-from typing import Any, Dict, Iterator, List, Optional
+from collections.abc import Iterator
+from typing import Any
+
 from src.domain.enums import RegulatoryFramework, RuleSeverity, Severity
 from src.domain.models import RegulatoryRule
 
@@ -19,7 +21,7 @@ _CRITICAL = getattr(Severity, "CRITICAL", getattr(RuleSeverity, "CRITICAL", "CRI
 _HIGH = getattr(Severity, "HIGH", getattr(RuleSeverity, "HIGH", "HIGH"))
 _MEDIUM = getattr(Severity, "MEDIUM", getattr(RuleSeverity, "MEDIUM", "MEDIUM"))
 
-REGULATORY_RULE_CATALOG: List[RegulatoryRule] = [
+REGULATORY_RULE_CATALOG: list[RegulatoryRule] = [
     # -------------------------------------------------------------------------
     # TIER 1 CRITICAL: High-Yield Investment Fraud (FATF & FCA Benchmarks)
     # -------------------------------------------------------------------------
@@ -221,7 +223,7 @@ REGULATORY_RULE_CATALOG: List[RegulatoryRule] = [
 ]
 
 # Fast O(1) hash map index pre-computation
-_RULE_MAP: Dict[str, RegulatoryRule] = {rule.rule_id: rule for rule in REGULATORY_RULE_CATALOG}
+_RULE_MAP: dict[str, RegulatoryRule] = {rule.rule_id: rule for rule in REGULATORY_RULE_CATALOG}
 
 
 def _validate_all_catalog_patterns() -> None:
@@ -258,14 +260,14 @@ class RegulatoryCatalogMeta(type):
 class RegulatoryCatalog(metaclass=RegulatoryCatalogMeta):
     """Enterprise Regulatory Rule Catalog registry for statutory inspection engines."""
 
-    RULES: List[RegulatoryRule] = REGULATORY_RULE_CATALOG
-    rules: List[RegulatoryRule] = REGULATORY_RULE_CATALOG
+    RULES: list[RegulatoryRule] = REGULATORY_RULE_CATALOG
+    rules: list[RegulatoryRule] = REGULATORY_RULE_CATALOG
 
-    def __init__(self, custom_rules: Optional[List[RegulatoryRule]] = None) -> None:
+    def __init__(self, custom_rules: list[RegulatoryRule] | None = None) -> None:
         """Initializes catalog instance with standard or customized statutory rules."""
         if custom_rules is not None:
-            self._rules: List[RegulatoryRule] = list(custom_rules)
-            self._instance_map: Dict[str, RegulatoryRule] = {
+            self._rules: list[RegulatoryRule] = list(custom_rules)
+            self._instance_map: dict[str, RegulatoryRule] = {
                 rule.rule_id: rule for rule in self._rules
             }
         else:
@@ -273,44 +275,42 @@ class RegulatoryCatalog(metaclass=RegulatoryCatalogMeta):
             self._instance_map = dict(_RULE_MAP)
 
     @classmethod
-    def get_rules(cls) -> List[RegulatoryRule]:
+    def get_rules(cls) -> list[RegulatoryRule]:
         """Returns defensive copy of all statutory rules codified in the catalog."""
         return list(cls.RULES)
 
     @classmethod
-    def get_all_rules(cls) -> List[RegulatoryRule]:
+    def get_all_rules(cls) -> list[RegulatoryRule]:
         """Alias returning all codified regulatory rules."""
         return list(cls.RULES)
 
     @classmethod
-    def get_rule_by_id(cls, rule_id: str) -> Optional[RegulatoryRule]:
+    def get_rule_by_id(cls, rule_id: str) -> RegulatoryRule | None:
         """Finds a rule definition by its canonical statutory identifier in O(1) time."""
         return _RULE_MAP.get(rule_id)
 
     @classmethod
-    def get_rules_by_framework(
-        cls, framework: RegulatoryFramework
-    ) -> List[RegulatoryRule]:
+    def get_rules_by_framework(cls, framework: RegulatoryFramework) -> list[RegulatoryRule]:
         """Filters catalog rules by specific governing regulatory framework."""
         return [rule for rule in cls.RULES if rule.regulatory_framework == framework]
 
     @classmethod
-    def get_rules_by_category(cls, category: str) -> List[RegulatoryRule]:
+    def get_rules_by_category(cls, category: str) -> list[RegulatoryRule]:
         """Filters catalog rules by substantive violation category."""
         target = category.strip().lower()
         return [rule for rule in cls.RULES if rule.category.strip().lower() == target]
 
     @classmethod
-    def get_rules_by_severity(cls, severity: Any) -> List[RegulatoryRule]:
+    def get_rules_by_severity(cls, severity: Any) -> list[RegulatoryRule]:
         """Filters catalog rules by statutory severity tier."""
         return [rule for rule in cls.RULES if rule.severity == severity]
 
     @property
-    def all_rules(self) -> List[RegulatoryRule]:
+    def all_rules(self) -> list[RegulatoryRule]:
         """Returns list of rules for instance-level access."""
         return list(self._rules)
 
-    def find_by_id(self, rule_id: str) -> Optional[RegulatoryRule]:
+    def find_by_id(self, rule_id: str) -> RegulatoryRule | None:
         """Instance-level lookup for rule definitions by identifier."""
         return self._instance_map.get(rule_id)
 

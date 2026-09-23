@@ -2,9 +2,8 @@
 
 from __future__ import annotations
 
-from typing import Callable
+from collections.abc import Callable
 
-from src.domain.enums import RegulatoryFramework, RiskSeverity
 from src.domain.models import DocumentPayload
 from src.engines.heuristic_scanner import HeuristicScanner
 from src.ingestion.normalizer import TextNormalizer

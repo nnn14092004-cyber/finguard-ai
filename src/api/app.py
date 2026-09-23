@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict
+from typing import Any
+
 from fastapi import FastAPI, File, HTTPException, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -32,7 +33,7 @@ pipeline_instance = FinGuardPipeline()
 
 
 @app.get("/", tags=["Discovery"])
-def root() -> Dict[str, Any]:
+def root() -> dict[str, Any]:
     """Returns service discovery metadata, navigation endpoints, and documentation links.
 
     Returns:
@@ -53,7 +54,7 @@ def root() -> Dict[str, Any]:
 
 
 @app.get("/health", tags=["Telemetry"])
-def health_check() -> Dict[str, str]:
+def health_check() -> dict[str, str]:
     """Returns operational health telemetry status.
 
     Returns:

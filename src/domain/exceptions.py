@@ -6,7 +6,7 @@ Follows PEP 3151 standard design principles.
 
 from __future__ import annotations
 
-from typing import Any, Dict, Optional
+from typing import Any
 
 
 class FinGuardDomainException(Exception):
@@ -16,14 +16,14 @@ class FinGuardDomainException(Exception):
         self,
         message: str,
         error_code: str,
-        context: Optional[Dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
     ) -> None:
         super().__init__(message)
         self.message = message
         self.error_code = error_code
         self.context = context or {}
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Serializes domain exception for API and telemetry sinks."""
         return {
             "error_type": self.__class__.__name__,
@@ -36,7 +36,7 @@ class FinGuardDomainException(Exception):
 class IngestionNormalizationError(FinGuardDomainException):
     """Raised when an inbound contract payload cannot be decoded or normalized."""
 
-    def __init__(self, message: str, context: Optional[Dict[str, Any]] = None) -> None:
+    def __init__(self, message: str, context: dict[str, Any] | None = None) -> None:
         super().__init__(
             message=message,
             error_code="ERR_INGESTION_NORMALIZATION_FAILED",
@@ -58,7 +58,7 @@ class RegulatoryRuleCompilationError(FinGuardDomainException):
 class UnregisteredSecuritiesViolationError(FinGuardDomainException):
     """Raised when a contract satisfies all prongs of the 1946 SEC Howey Test."""
 
-    def __init__(self, context: Optional[Dict[str, Any]] = None) -> None:
+    def __init__(self, context: dict[str, Any] | None = None) -> None:
         super().__init__(
             message="Contract manifests passive pooling syndication violating SEC Howey registration mandates.",
             error_code="ERR_SEC_HOWEY_UNREGISTERED_SECURITY",

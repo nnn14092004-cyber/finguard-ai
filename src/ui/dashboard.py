@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import pathlib
 import sys
-from typing import Dict, Tuple
 
 # Ensure repository root is on sys.path for standalone Streamlit execution
 ROOT_DIR = pathlib.Path(__file__).resolve().parent.parent.parent
@@ -18,7 +17,7 @@ from src.domain.enums import RiskTier
 from src.domain.models import AuditAssessmentReport
 from src.pipeline import FinGuardPipeline
 
-AUDIT_PRESETS: Dict[str, str] = {
+AUDIT_PRESETS: dict[str, str] = {
     "Aura Neural Protocol (Multi-Tier Recruitment)": (
         "AURA NEURAL PROTOCOL:\n"
         "Participants deposit capital into our autonomous liquidity allocation matrix.\n"
@@ -132,7 +131,7 @@ def get_pipeline() -> FinGuardPipeline:
     return FinGuardPipeline()
 
 
-def render_sidebar() -> Tuple[str, str]:
+def render_sidebar() -> tuple[str, str]:
     """Renders document input controls and scenario selection."""
     st.sidebar.title("FinGuard Engine")
     st.sidebar.caption("Financial Compliance Assessment Interface")
@@ -374,7 +373,9 @@ def render_audit_details(report: AuditAssessmentReport) -> None:
 
     with tab_findings:
         if not report.findings and not report.semantic_findings:
-            st.success("No statutory violations detected. Instrument aligns with standard commercial baselines.")
+            st.success(
+                "No statutory violations detected. Instrument aligns with standard commercial baselines."
+            )
         else:
             for idx, finding in enumerate(report.findings, start=1):
                 rule_id = getattr(finding, "rule_id", "FLAG")
@@ -385,18 +386,26 @@ def render_audit_details(report: AuditAssessmentReport) -> None:
                 framework = getattr(finding, "regulatory_framework", "")
                 category = getattr(finding, "category", "General")
 
-                with st.expander(f"Finding #{idx}: [{rule_id}] {rule_name} (+{weight} pts)", expanded=True):
+                with st.expander(
+                    f"Finding #{idx}: [{rule_id}] {rule_name} (+{weight} pts)", expanded=True
+                ):
                     st.write(f"**Framework:** `{framework}` | **Category:** `{category}`")
-                    st.markdown(f'<div class="verbatim-box">"{matched}"</div>', unsafe_allow_html=True)
+                    st.markdown(
+                        f'<div class="verbatim-box">"{matched}"</div>', unsafe_allow_html=True
+                    )
                     st.write(f"**Remediation Action:** {advice}")
 
             for idx, sf in enumerate(report.semantic_findings, start=len(report.findings) + 1):
                 topic = getattr(sf, "clause_topic", getattr(sf, "category", "Semantic Finding"))
                 penalty = getattr(sf, "penalty_weight", getattr(sf, "weight", 20))
                 text = getattr(sf, "context_snippet", getattr(sf, "matched_text", ""))
-                guidance = getattr(sf, "remediation_guidance", getattr(sf, "remediation_advice", ""))
+                guidance = getattr(
+                    sf, "remediation_guidance", getattr(sf, "remediation_advice", "")
+                )
 
-                with st.expander(f"Finding #{idx}: [SEMANTIC] {topic} (+{penalty} pts)", expanded=True):
+                with st.expander(
+                    f"Finding #{idx}: [SEMANTIC] {topic} (+{penalty} pts)", expanded=True
+                ):
                     st.markdown(f'<div class="verbatim-box">"{text}"</div>', unsafe_allow_html=True)
                     st.write(f"**Deception Analysis:** {guidance}")
 

@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import uuid
-from typing import Callable
+from collections.abc import Callable
+
 import pytest
 
 from src.domain.models import DocumentPayload
@@ -86,6 +87,7 @@ def blank_contract() -> str:
 @pytest.fixture
 def create_payload() -> Callable[[str, str], DocumentPayload]:
     """Factory fixture generating valid DocumentPayload instances."""
+
     def _factory(raw_text: str, file_name: str = "test_document.txt") -> DocumentPayload:
         normalized = TextNormalizer.normalize(raw_text)
         return DocumentPayload(
