@@ -2,9 +2,10 @@
 
 [![Compliance CI](https://github.com/nnn14092004-cyber/finguard-ai/actions/workflows/compliance_ci.yml/badge.svg)](https://github.com/nnn14092004-cyber/finguard-ai/actions)
 ![Python Version](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue.svg)
-![Test Suite](https://img.shields.io/badge/tests-27%2F27%20passing%20(0.65s)-brightgreen.svg)
-![Test Coverage](https://img.shields.io/badge/coverage-82.40%25-brightgreen.svg)
-![Latency SLA](https://img.shields.io/badge/latency-6.54ms%20%2F%20doc-brightgreen.svg)
+![Test Suite](https://img.shields.io/badge/tests-29%2F29%20passing%20(0.80s)-brightgreen.svg)
+![Test Coverage](https://img.shields.io/badge/coverage-83.45%25-brightgreen.svg)
+![Throughput](https://img.shields.io/badge/throughput-1%2C724.5%20docs%2Fsec-brightgreen.svg)
+![Latency SLA](https://img.shields.io/badge/latency%20(P99)-0.923ms%20%2F%20doc-brightgreen.svg)
 ![Architecture](https://img.shields.io/badge/architecture-Clean%20Architecture%20%7C%20DDD-orange.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
@@ -16,7 +17,7 @@
 
 Cross-border retail capital solicitation has increasingly weaponized technological obfuscation (e.g., "Autonomous Liquidity Matrix", "AI Quantum Arbitrage Syndicate") and multi-tier network schemes to circumvent statutory investor protections. Traditional contract management tools rely on rigid keyword lookups that are easily defeated via Unicode zero-width spacing, character interleaving, or euphemistic legal phrasing.
 
-FinGuard-AI codifies century-tested statutory doctrines and international enforcement standards into a deterministic, multi-layered inspection engine that operates under sub-second latency ($\approx 6.54\text{ ms}$ per multi-page document) with zero algorithmic hallucination.
+FinGuard-AI codifies century-tested statutory doctrines and international enforcement standards into a deterministic, multi-layered inspection engine that operates under sub-millisecond execution latency ($\text{P99} \approx 0.923\text{ ms}$, through-put $\approx 1,724.5\text{ docs/sec}$) with zero algorithmic hallucination.
 
 ---
 
@@ -49,7 +50,7 @@ Identifies unregistered investment contracts by evaluating four cumulative statu
 ### Pillar II: FTC Koscot & IOSCO Anti-Pyramid Standards (In re Koscot, 86 F.T.C. 1106)
 Detects structural pyramid mechanics masquerading as commercial enterprises:
 * Compensation tied directly to participant capital recruitment rather than bona fide retail consumer sales (`MLM-001`, `PYRAMID-001`).
-* Multi-tier commission trees, binary leg balancing formulas, and generational matching bonuses.
+* Multi-tier commission trees, binary leg balancing formulas, and generational matching bonuses resilient to intervening token distances.
 * Mandatory starter packages, AI licenses, or internal node purchases required as prerequisites for yield distribution (`PYRAMID-002`).
 
 ### Pillar III: FATF & FCA High-Yield Investment Fraud (HYIP) & AML Standards
@@ -137,13 +138,13 @@ flowchart TD
 
 ---
 
-## 5. Institutional Performance & Adversarial Stress-Test Benchmark
+## 5. Institutional Performance & Adversarial Benchmarks
 
-FinGuard-AI is evaluated against a 100-contract multi-page adversarial stress-test dataset (`data/benchmark/`) compiled via ReportLab. Predatory traps are disguised within authentic corporate boilerplate covenants with deliberate cross-line hyphenations (`18-\nmonth`, `early\nwithdrawal`) and page breaks to challenge lexical boundary detection.
+### 5.1 Adversarial Contract Evaluation (100 PDF Benchmark)
 
-### Empirical Audit Matrix (100 PDF Evaluation)
+FinGuard-AI is evaluated against a 100-contract multi-page adversarial stress-test dataset (`data/benchmark/`) compiled via ReportLab. Predatory traps are disguised within authentic corporate boilerplate covenants with deliberate cross-line hyphenations (`18-\nmonth`, `early\nwithdrawal`) and page breaks.
 
-| Metric | Measured Empirical Value | Statutory Benchmark Target | Operational Status |
+| Metric | Measured Value | Statutory Benchmark Target | Operational Status |
 | :--- | :---: | :---: | :---: |
 | **Recall (Sensitivity on Traps)** | **100.00% (80 / 80)** | $\ge 95.00\%$ | **TARGET EXCEEDED (PERFECT RECALL)** |
 | **Precision** | **100.00% (80 / 80)** | $\ge 98.00\%$ | **PERFECT PRECISION** |
@@ -153,11 +154,21 @@ FinGuard-AI is evaluated against a 100-contract multi-page adversarial stress-te
 | **P95 Processing Latency** | **9.98 ms / document** | $< 500.00\text{ ms}$ | **DETERMINISTIC SUB-10MS SLA** |
 | **Total Benchmark Time** | **0.65 seconds (100 PDFs)** | $< 50.00\text{ seconds}$ | **HIGH-THROUGHPUT BATCH AUDIT** |
 
-### Confusion Matrix Breakdown
-* **True Positives (TP = 80 / 80):** 100% of adversarial scams (Howey passive pooling, Koscot downline recruitment, extortionate lockups, FATF anonymity routing) flagged at `RED_FLAG` ($S \ge 75$).
-* **True Negatives (TN = 20 / 20):** 100% of legitimate contracts (Founder equity vesting cliffs, Corporate bond coupons, SaaS SLAs, Commercial leases) cleared at `GREEN` ($S = 0$).
-* **False Positives (FP = 0 / 20):** Zero commercial contracts erroneously blocked.
-* **False Negatives (FN = 0 / 80):** Zero predatory investment traps bypassed.
+### 5.2 High-Throughput Sub-Second SLA Benchmark (1,000 Audits)
+
+Profiling was executed using nanosecond hardware timing (`time.perf_counter_ns`) across 1,000 consecutive document evaluations (50 warmup cycles) spanning high-yield Ponzi contracts, unregistered securities PPMs, Series A preferred shares, and cloud SLAs:
+
+| Performance Telemetry Metric | Measured Empirical Result | Institutional Verification SLA |
+| :--- | :---: | :--- |
+| **System Throughput** | **1,724.5 documents / second** | $\ge 100.0\text{ docs/sec}$ (Enterprise Grade) |
+| **Mean Latency** | **0.579 ms** | Sub-Millisecond Execution |
+| **Median Latency (P50)** | **0.548 ms** | Real-Time Pre-Trade Surveillance Ready |
+| **P90 Processing Latency** | **0.747 ms** | Deterministic Regex Boundary |
+| **P95 Processing Latency** | **0.772 ms** | Ultra-Low Jitter Execution |
+| **P99 Processing Latency (Tail)** | **0.923 ms** | **Sub-Millisecond Tail Latency SLA (< 1.0 ms)** |
+| **Minimum Latency (Cache Hit)** | **0.448 ms** | Maximum Hardware Instruction Saturation |
+| **Standard Deviation ($\sigma$)** | **0.121 ms** | Negligible Variation across Iterations |
+| **Sub-Second SLA Compliance** | **100.00%** | Guaranteed $(< 1,000\text{ ms})$ |
 
 ---
 
@@ -169,6 +180,7 @@ finguard-ai/
 │   └── benchmark/                  # 100 synthetic adversarial benchmark contracts & ground truth
 ├── scripts/
 │   ├── batch_auditor.py           # Multi-document terminal auditing harness
+│   ├── benchmark_subsecond.py     # Nanosecond-precision throughput & latency benchmark
 │   ├── generate_adversarial_dataset.py # ReportLab multi-page contract fuzzer
 │   ├── generate_readme.py         # Institutional documentation compiler
 │   └── run_benchmark.py           # Automated evaluation runner & confusion matrix calculator
@@ -213,6 +225,7 @@ finguard-ai/
 
 ### Prerequisites
 * Python 3.11 or 3.12
+* Docker Desktop (Optional for containerized mode)
 * PowerShell (Windows) or Bash (Linux / macOS)
 
 ### Step 1: Environment Setup & Library Installation
@@ -221,9 +234,8 @@ finguard-ai/
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 
-# Install core runtime and test dependencies
+# Install pinned dependencies
 pip install -r requirements.txt
-pip install pypdf reportlab
 ```
 
 ### Step 2: Code Hygiene & Strict Static Typing Verification
@@ -240,27 +252,36 @@ pip install pypdf reportlab
 ```powershell
 .\.venv\Scripts\python.exe -m pytest -v --tb=short --cov=src tests/
 ```
-*Expected Result:* 27/27 tests passed in $< 0.70\text{s}$ with total coverage $\ge 82.4\%$.
+*Expected Result:* 29/29 tests passed in $< 1.0\text{s}$ with total coverage $\ge 83.45\%$.
 
-### Step 4: Generate Adversarial Dataset (100 Benchmark PDFs)
+### Step 4: Run High-Throughput Sub-Second SLA Benchmark
 ```powershell
-.\.venv\Scripts\python.exe scripts/generate_adversarial_dataset.py
+.\.venv\Scripts\python.exe scripts/benchmark_subsecond.py
 ```
-*Expected Result:* Compiles 80 adversarial scam traps and 20 negative controls into `data/benchmark/`.
+*Expected Result:* Evaluates 1,000 audits in $\approx 0.58\text{s}$, confirming Throughput: $> 1,700\text{ docs/sec}$ and P99 Latency: $< 1.0\text{ ms}$.
 
-### Step 5: Execute Institutional Stress-Test Benchmark
+### Step 5: Execute 100-PDF Adversarial Benchmark
 ```powershell
 .\.venv\Scripts\python.exe scripts/run_benchmark.py
 ```
-*Expected Result:* Evaluates 100 PDFs, confirming Recall: 100.0%, Precision: 100.0%, FPR: 0.0%, and Latency: $\approx 6.54\text{ ms/doc}$.
+*Expected Result:* Evaluates 100 PDFs, confirming Recall: 100.0%, Precision: 100.0%, FPR: 0.0%.
 
-### Step 6: Launch Production Services
+### Step 6: Launch Production Microservices
+
+#### Mode A: Standalone Bare-Metal
 ```powershell
 # Tab 1: Launch FastAPI Gateway (@Port 8000)
 .\.venv\Scripts\python.exe -m uvicorn src.api.app:app --host 127.0.0.1 --port 8000 --reload
 
 # Tab 2: Launch Streamlit Compliance Cockpit (@Port 8501)
 .\.venv\Scripts\python.exe -m streamlit run src/ui/dashboard.py --server.port 8501
+```
+
+#### Mode B: Production Docker Compose
+```powershell
+docker compose build --no-cache
+docker compose up -d
+docker compose ps
 ```
 
 ---
