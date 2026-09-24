@@ -31,7 +31,7 @@ FinGuard-AI resolves this trilemma by pioneering a **Hybrid Two-Tier RegTech Arc
 
 ## 2. Codified Statutory Frameworks & Jurisprudential Doctrines
 
-The inspection core codifies four foundational pillars of international financial jurisprudence:
+The inspection core codifies four foundational pillars of international financial jurisprudence derived from the Global Regulatory Knowledge Base (`docs/finguard_global_knowledge_base.md`):
 
 ```mermaid
 flowchart TD
@@ -202,6 +202,8 @@ finguard-ai/
 ├── data/
 │   ├── benchmark/                  # 100 synthetic adversarial benchmark contracts & ground truth
 │   └── historical_cases/           # 5 canonical historical fraud specimens & manifest
+├── docs/
+│   └── finguard_global_knowledge_base.md # Statutory single source of truth & regulatory benchmarks
 ├── scripts/
 │   ├── batch_auditor.py           # Multi-document terminal auditing harness
 │   ├── benchmark_subsecond.py     # Nanosecond-precision throughput & latency benchmark
@@ -212,26 +214,36 @@ finguard-ai/
 │   └── test_historical_cases.py   # Historical prosecutorial backtest harness
 ├── src/
 │   ├── api/
+│   │   ├── __init__.py            # API package marker
 │   │   └── app.py                 # FastAPI high-throughput REST gateway
 │   ├── core/
+│   │   ├── __init__.py            # Core package marker
 │   │   └── config.py              # Pydantic v2 centralized configuration
 │   ├── domain/
+│   │   ├── __init__.py            # Domain models package marker
 │   │   ├── enums.py               # Statutory tiers, severities, and regulatory frameworks
 │   │   └── models.py              # Strongly-typed domain models & assessment schemas
 │   ├── engines/
+│   │   ├── __init__.py            # Inspection engines package marker
 │   │   ├── heuristic_scanner.py   # O(1) multi-pattern deterministic compliance scanner
 │   │   ├── scoring_engine.py      # 4D vector risk rubric & SHA-256 provenance calculator
 │   │   └── semantic_auditor.py    # Cognitive semantic auditor & pre-compiled fallback engine
 │   ├── ingestion/
+│   │   ├── __init__.py            # Document ingestion package marker
 │   │   └── normalizer.py          # In-memory PDF text extractor & anti-obfuscation normalizer
 │   ├── reporting/
+│   │   ├── __init__.py            # Reporting package marker
 │   │   └── pdf_generator.py       # ReportLab court-admissible forensic dossier generator
 │   ├── rules/
+│   │   ├── __init__.py            # Rule registry package marker
 │   │   └── catalog.py             # Codified registry of 15 international statutory rules
 │   ├── ui/
+│   │   ├── __init__.py            # UI package marker
 │   │   └── dashboard.py           # Streamlit compliance cockpit with 4D polar radar
+│   ├── __init__.py                # Top-level engine package marker
 │   └── pipeline.py                # Unified orchestration facade
 ├── tests/
+│   ├── __init__.py                # Test suite package marker
 │   ├── test_api.py                # REST gateway integration test suite
 │   ├── test_heuristic_scanner.py  # Regex pattern & de-obfuscation unit tests
 │   ├── test_ingestion_pdf.py      # PDF text extraction & dehyphenation tests
@@ -239,8 +251,12 @@ finguard-ai/
 │   ├── test_reporting.py          # PDF dossier compiler verification
 │   ├── test_scoring_engine.py     # Mathematical scoring & vector decomposition tests
 │   └── test_semantic_auditor.py   # NLP fallback & mocked LLM parsing tests
+├── .dockerignore                  # Docker build boundary exclusion rules
+├── .env.example                   # Template environment configuration (zero credentials)
+├── .gitignore                     # Repository hygiene & build artifact exclusion rules
 ├── docker-compose.yml             # Dual-service production orchestration
 ├── Dockerfile                     # Multi-stage container build with non-root security user
+├── LICENSE                        # Canonical MIT Open-Source License
 ├── pyproject.toml                 # Ruff, Mypy, and Pytest configuration
 ├── requirements.txt               # Pinned institutional dependency manifests
 └── README.md                      # Institutional system documentation
@@ -268,8 +284,8 @@ pip install -r requirements.txt
 ### Step 2: Code Hygiene & Strict Static Typing Verification
 ```powershell
 # Lint and format inspection
-.\.venv\Scripts\python.exe -m ruff check src tests
-.\.venv\Scripts\python.exe -m ruff format --check src tests
+.\.venv\Scripts\python.exe -m ruff check src tests scripts
+.\.venv\Scripts\python.exe -m ruff format --check src tests scripts
 
 # Strict static type verification
 .\.venv\Scripts\python.exe -m mypy src

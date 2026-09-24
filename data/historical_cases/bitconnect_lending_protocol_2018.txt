@@ -1,0 +1,13 @@
+BITCONNECT LENDING PROTOCOL: TERMS AND PARTICIPATION COVENANT
+
+1. Capital Commitment and Volatility Software Arbitrage:
+Participants agree to deposit Bitcoin (BTC) converted into internal BCC tokens to participate in our automated liquidity pool. Capital is fully managed by the BitConnect Trading Bot and proprietary Volatility Software. Participants remain completely passive investors with no trading expertise required, enjoying steady passive income derived solely from the managerial efforts of our automated arbitrage algorithms.
+
+2. Guaranteed High-Yield Velocity Assertions:
+The protocol provides a guaranteed 1.5% daily return, yielding up to 40% fixed return monthly. We provide 100% capital guaranteed protection on all deposited principal via our automated arbitrage volatility stabilizer, ensuring absolute zero-risk investment participation.
+
+3. Multi-Tier Downline Affiliate Architecture:
+Participants earn multi-tier referral downline investment volume bonuses across a 7-level deep compensation tree. Receive a direct 8% referral commission on recruited capital, plus generational matching bonus payouts on Level 2 through Level 7 downline staking volume.
+
+4. Mandatory Capital Lockup and Anonymous Routing:
+Deposited funds are subject to a mandatory 18-month lock-up period. Any approved early withdrawal incurs punitive liquidation deductions where the early exit penalty fee strips 40% of initial principal. All outbound distributions are processed by routing payments through unverified escrow to personal crypto wallets without KYC verification required.

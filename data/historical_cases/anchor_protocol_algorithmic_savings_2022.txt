@@ -1,0 +1,10 @@
+ANCHOR PROTOCOL DEPOSIT TERMS AND LIQUIDITY CONDITIONS
+
+1. High-Yield Fixed Benchmark Guarantee:
+Users depositing UST into the Anchor Liquidity Vault receive a guaranteed 19.5% to 20% annual yield, structured as a fixed daily return credited directly to the user's unhosted wallet. The Anchor Yield Reserve maintains complete insulation from principal volatility, providing algorithmic capital protection.
+
+2. Unilateral Protocol Alteration Rights:
+The Foundation reserves the right to amend terms and modify yield rates at its sole discretion without prior notice to depositors. Rate parameters and borrow incentives may be unilaterally altered based upon internal governance consensus.
+
+3. Offshore Secrecy Incorporation & Venue:
+This protocol is developed under the jurisdiction of the British Virgin Islands (BVI). Any dispute arising under protocol liquidity operations shall be settled exclusively by arbitration in Seychelles.

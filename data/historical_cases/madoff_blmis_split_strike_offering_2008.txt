@@ -1,0 +1,10 @@
+FAIRFIELD SENTRY / BLMIS SPLIT-STRIKE CONVERSION SYNDICATION MEMORANDUM
+
+1. Horizontal Capital Pooling & Managerial Discretion:
+All incoming institutional and retail capital is commingled into a common enterprise designated as the Central Liquidity Allocation Matrix. Participants execute complete pooling of investor funds. All portfolio allocations, S&P 100 basket acquisitions, and OEX collar options are handled entirely by the investment manager. Returns are derived solely from the managerial efforts of the promoter, with clients acting as completely passive investors.
+
+2. Algorithmic Market Insulation Benchmark:
+The Split-Strike strategy guarantees complete insulation from market volatility, asserting consistent 12.5% annual distributions without market risk, regardless of broader equity drawdowns.
+
+3. Offshore Forum Venue and Fiduciary Exculpation:
+Custodial disputes and feeder claims are resolved exclusively via arbitration in the Cayman Islands. The fund manager absolves the company of all liability for smart contract failure, audit non-disclosure, or third-party custodian insolvency.

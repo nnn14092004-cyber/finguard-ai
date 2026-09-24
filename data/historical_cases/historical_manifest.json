@@ -1,0 +1,63 @@
+[
+  {
+    "case_id": "CASE-001-BITCONNECT",
+    "file_name": "bitconnect_lending_protocol_2018.txt",
+    "pdf_file": "bitconnect_lending_protocol_2018.pdf",
+    "title": "BitConnect Global Liquidity & Volatility Software Lending Memorandum",
+    "expected_tier": "RED_FLAG",
+    "target_rules": [
+      "HYIP-001",
+      "MLM-001",
+      "HOWEY-001",
+      "TECH-001",
+      "AML-001"
+    ]
+  },
+  {
+    "case_id": "CASE-002-ZEEKREWARDS",
+    "file_name": "zeekrewards_retail_evasion_ppm_2012.txt",
+    "pdf_file": "zeekrewards_retail_evasion_ppm_2012.pdf",
+    "title": "Rex Venture Group d/b/a ZeekRewards Customer Acquisition & Profit Pool Agreement",
+    "expected_tier": "RED_FLAG",
+    "target_rules": [
+      "MLM-001",
+      "PYRAMID-001",
+      "PYRAMID-002",
+      "HYIP-001"
+    ]
+  },
+  {
+    "case_id": "CASE-003-MADOFF-BLMIS",
+    "file_name": "madoff_blmis_split_strike_offering_2008.txt",
+    "pdf_file": "madoff_blmis_split_strike_offering_2008.pdf",
+    "title": "Bernard L. Madoff Investment Securities (BLMIS) Split-Strike Conversion Memorandum",
+    "expected_tier": "RED_FLAG",
+    "target_rules": [
+      "HOWEY-001",
+      "TECH-001",
+      "UNFAIR-002",
+      "JUR-001"
+    ]
+  },
+  {
+    "case_id": "CASE-004-ANCHOR-TERRA",
+    "file_name": "anchor_protocol_algorithmic_savings_2022.txt",
+    "pdf_file": "anchor_protocol_algorithmic_savings_2022.pdf",
+    "title": "Anchor Protocol Algorithmic High-Yield Savings & Yield Reserve Terms",
+    "expected_tier": "RED_FLAG",
+    "target_rules": [
+      "HYIP-001",
+      "TECH-001",
+      "UNFAIR-001",
+      "JUR-001"
+    ]
+  },
+  {
+    "case_id": "CASE-005-NVCA-SERIES-A",
+    "file_name": "nvca_series_a_preferred_stock_control.txt",
+    "pdf_file": "nvca_series_a_preferred_stock_control.pdf",
+    "title": "National Venture Capital Association (NVCA) Standard Series A Purchase Agreement",
+    "expected_tier": "GREEN",
+    "target_rules": []
+  }
+]
