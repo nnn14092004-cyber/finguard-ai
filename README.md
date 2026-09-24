@@ -16,7 +16,7 @@
 
 Cross-border retail capital solicitation has increasingly weaponized technological obfuscation (e.g., "Autonomous Liquidity Matrix", "AI Quantum Arbitrage Syndicate") and multi-tier network schemes to circumvent statutory investor protections. Traditional contract management tools rely on rigid keyword lookups that are easily defeated via Unicode zero-width spacing, character interleaving, or euphemistic legal phrasing.
 
-FinGuard-AI codifies century-tested statutory doctrines and international enforcement standards into a deterministic, multi-layered inspection engine that operates under sub-second latency ($pprox 6.54	ext{ ms}$ per multi-page document) with zero algorithmic hallucination.
+FinGuard-AI codifies century-tested statutory doctrines and international enforcement standards into a deterministic, multi-layered inspection engine that operates under sub-second latency ($\approx 6.54\text{ ms}$ per multi-page document) with zero algorithmic hallucination.
 
 ---
 
@@ -67,7 +67,7 @@ Neutralizes predatory legal covenants designed to compromise investor recovery:
 
 The evaluation pipeline synthesizes identified infractions into an aggregate scalar **Suspicion Score ($S$)**, strictly bounded within the closed interval $[0, 100]$:
 
-$$S = \min\left(100, \max\left(0, \sum_{i=1}^{N} w_i \cdot c_iight)ight)$$
+$$S = \min\left(100, \max\left(0, \sum_{i=1}^{N} w_i \cdot c_i\right)\right)$$
 
 Where:
 * $w_i \in \{10, 20, 40\}$: Statutory penalty weight assigned to codified rule $i$.
@@ -86,12 +86,12 @@ Where:
 
 In addition to the scalar score, FinGuard-AI decomposes contractual exposure into an orthogonal four-dimensional risk vector:
 
-$$\mathbf{R} = egin{bmatrix} R_{	ext{yield}} \ R_{	ext{structural}} \ R_{	ext{liquidity}} \ R_{	ext{legal}} \end{bmatrix} \in [0, 100]^4$$
+$$\mathbf{R} = \begin{bmatrix} R_{\text{yield}} \\ R_{\text{structural}} \\ R_{\text{liquidity}} \\ R_{\text{legal}} \end{bmatrix} \in [0, 100]^4$$
 
-* **Yield Velocity Risk ($R_{	ext{yield}}$):** Measures claims of absolute capital guarantees and daily/monthly yields decoupled from risk-free benchmarks.
-* **Structural / MLM Risk ($R_{	ext{structural}}$):** Measures passive pooling under Howey Prong 4 and multi-tier downline referral commission trees.
-* **Liquidity Lockup Risk ($R_{	ext{liquidity}}$):** Measures capital freezing intervals and predatory early redemption penalties.
-* **Legal Jurisdiction Risk ($R_{	ext{legal}}$):** Measures unilateral amendment rights, fiduciary waivers, and offshore secrecy forum evasion.
+* **Yield Velocity Risk ($R_{\text{yield}}$):** Measures claims of absolute capital guarantees and daily/monthly yields decoupled from risk-free benchmarks.
+* **Structural / MLM Risk ($R_{\text{structural}}$):** Measures passive pooling under Howey Prong 4 and multi-tier downline referral commission trees.
+* **Liquidity Lockup Risk ($R_{\text{liquidity}}$):** Measures capital freezing intervals and predatory early redemption penalties.
+* **Legal Jurisdiction Risk ($R_{\text{legal}}$):** Measures unilateral amendment rights, fiduciary waivers, and offshore secrecy forum evasion.
 
 ---
 
@@ -144,9 +144,9 @@ FinGuard-AI is evaluated against a 100-contract multi-page adversarial stress-te
 | **Precision** | **100.00% (80 / 80)** | $\ge 98.00\%$ | **PERFECT PRECISION** |
 | **False Positive Rate (FPR)** | **0.00% (0 / 20)** | $\le 2.00\%$ | **ZERO FALSE POSITIVES** |
 | **Overall Classification Accuracy** | **100.00% (100 / 100)** | $\ge 96.00\%$ | **INSTITUTIONAL REGTECH GRADE** |
-| **Average Processing Latency** | **6.54 ms / document** | $< 500.00	ext{ ms}$ | **SUB-SECOND REALTIME (76x FASTER)** |
-| **P95 Processing Latency** | **9.98 ms / document** | $< 500.00	ext{ ms}$ | **DETERMINISTIC SUB-10MS SLA** |
-| **Total Benchmark Time** | **0.65 seconds (100 PDFs)** | $< 50.00	ext{ seconds}$ | **HIGH-THROUGHPUT BATCH AUDIT** |
+| **Average Processing Latency** | **6.54 ms / document** | $< 500.00\text{ ms}$ | **SUB-SECOND REALTIME (76x FASTER)** |
+| **P95 Processing Latency** | **9.98 ms / document** | $< 500.00\text{ ms}$ | **DETERMINISTIC SUB-10MS SLA** |
+| **Total Benchmark Time** | **0.65 seconds (100 PDFs)** | $< 50.00\text{ seconds}$ | **HIGH-THROUGHPUT BATCH AUDIT** |
 
 ### Confusion Matrix Breakdown
 * **True Positives (TP = 80 / 80):** 100% of adversarial scams (Howey passive pooling, Koscot downline recruitment, extortionate lockups, FATF anonymity routing) flagged at `RED_FLAG` ($S \ge 75$).
@@ -235,7 +235,7 @@ pip install pypdf reportlab
 ```powershell
 .\.venv\Scripts\python.exe -m pytest -v --tb=short --cov=src tests/
 ```
-*Expected Result:* 27/27 tests passed in $< 0.70	ext{s}$ with total coverage $\ge 82.4\%$.
+*Expected Result:* 27/27 tests passed in $< 0.70\text{s}$ with total coverage $\ge 82.4\%$.
 
 ### Step 4: Generate Adversarial Dataset (100 Benchmark PDFs)
 ```powershell
@@ -247,7 +247,7 @@ pip install pypdf reportlab
 ```powershell
 .\.venv\Scripts\python.exe scripts/run_benchmark.py
 ```
-*Expected Result:* Evaluates 100 PDFs, confirming Recall: 100.0%, Precision: 100.0%, FPR: 0.0%, and Latency: $pprox 6.54	ext{ ms/doc}$.
+*Expected Result:* Evaluates 100 PDFs, confirming Recall: 100.0%, Precision: 100.0%, FPR: 0.0%, and Latency: $\approx 6.54\text{ ms/doc}$.
 
 ### Step 6: Launch Production Services
 ```powershell

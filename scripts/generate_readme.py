@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-# Raw documentation template using safe tokens to prevent web markdown rendering collisions
-RAW_TEMPLATE = """# FinGuard-AI: Institutional Contract Compliance & Regulatory Audit Pipeline
+# Using raw string (r"") to preserve backslashes for KaTeX math and formatting
+RAW_TEMPLATE = r"""# FinGuard-AI: Institutional Contract Compliance & Regulatory Audit Pipeline
 
 [![Compliance CI](https://github.com/nnn14092004-cyber/finguard-ai/actions/workflows/compliance_ci.yml/badge.svg)](https://github.com/nnn14092004-cyber/finguard-ai/actions)
 ![Python Version](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue.svg)
@@ -34,10 +34,10 @@ The inspection core directly references and enforces four governing pillars of i
 <TICK_MERMAID>
 flowchart TD
     subgraph Regulatory_Pillars [FinGuard-AI Statutory Enforcement Core]
-        P1["1. SEC Howey Doctrine (15 U.S.C. § 77e)\\nUnregistered Securities & Passive Managerial Reliance"]
-        P2["2. FTC Koscot & Amway Standards\\nPyramid Architecture & Downline Recruitment Bonuses"]
-        P3["3. FATF & FCA High-Yield Standards\\nDaily/Monthly Velocity, Capital Guarantees & AML Evasion"]
-        P4["4. Unfair Contract Terms & Jurisdiction Evasion\\nExtortionate Lockups, 40% Exit Penalties & Secrecy Havens"]
+        P1["1. SEC Howey Doctrine (15 U.S.C. § 77e)\nUnregistered Securities & Passive Managerial Reliance"]
+        P2["2. FTC Koscot & Amway Standards\nPyramid Architecture & Downline Recruitment Bonuses"]
+        P3["3. FATF & FCA High-Yield Standards\nDaily/Monthly Velocity, Capital Guarantees & AML Evasion"]
+        P4["4. Unfair Contract Terms & Jurisdiction Evasion\nExtortionate Lockups, 40% Exit Penalties & Secrecy Havens"]
     end
 <TICK>
 
@@ -109,17 +109,17 @@ FinGuard-AI follows Clean Architecture and Domain-Driven Design (DDD) principles
 <TICK_MERMAID>
 flowchart TD
     subgraph Ingestion_Layer [1. Document Ingestion & Anti-Obfuscation]
-        RAW["Raw Input\\n(Plain Text, Markdown, PDF Streams)"]
-        PYPDF["In-Memory pypdf Extractor\\n(Zero Disk I/O)"]
-        NORM["TextNormalizer\\n(Unicode NFKC, Dehyphenation, Soft Line-Wrap Normalization)"]
+        RAW["Raw Input\n(Plain Text, Markdown, PDF Streams)"]
+        PYPDF["In-Memory pypdf Extractor\n(Zero Disk I/O)"]
+        NORM["TextNormalizer\n(Unicode NFKC, Dehyphenation, Soft Line-Wrap Normalization)"]
         RAW --> PYPDF --> NORM
     end
 
     subgraph Core_Engine [2. Deterministic & Cognitive Inspection Core]
         PIPE["FinGuardPipeline Facade"]
-        HEUR["HeuristicScanner\\n(Pre-Compiled Regex Automata, 15 Rules)"]
-        SEM["SemanticAuditor\\n(LLM Analysis & Cached Fallback Automata)"]
-        SCORE["ScoringEngine\\n(Mathematical Vector Synthesis & SHA-256 Provenance)"]
+        HEUR["HeuristicScanner\n(Pre-Compiled Regex Automata, 15 Rules)"]
+        SEM["SemanticAuditor\n(LLM Analysis & Cached Fallback Automata)"]
+        SCORE["ScoringEngine\n(Mathematical Vector Synthesis & SHA-256 Provenance)"]
         
         NORM --> PIPE
         PIPE --> HEUR & SEM
@@ -127,10 +127,10 @@ flowchart TD
     end
 
     subgraph Delivery_Tier [3. Institutional Delivery & Presentation]
-        REP["AuditAssessmentReport\\n(Risk Tier, 4D Vector, Verbatim Evidence)"]
-        API["FastAPI Gateway Engine\\n(/api/v1/audit/text & /file & /analyze)"]
-        UI["Streamlit Compliance Cockpit\\n(4D Polar Radar Chart)"]
-        PDF["ReportLab Forensic Dossier\\n(Court-Admissible PDF Export)"]
+        REP["AuditAssessmentReport\n(Risk Tier, 4D Vector, Verbatim Evidence)"]
+        API["FastAPI Gateway Engine\n(/api/v1/audit/text & /file & /analyze)"]
+        UI["Streamlit Compliance Cockpit\n(4D Polar Radar Chart)"]
+        PDF["ReportLab Forensic Dossier\n(Court-Admissible PDF Export)"]
         
         SCORE --> REP
         REP --> API & UI & PDF
@@ -141,7 +141,7 @@ flowchart TD
 
 ## 5. Institutional Performance & Adversarial Stress-Test Benchmark
 
-FinGuard-AI is evaluated against a 100-contract multi-page adversarial stress-test dataset (`data/benchmark/`) compiled via ReportLab. Predatory traps are disguised within authentic corporate boilerplate covenants with deliberate cross-line hyphenations (`18-\\nmonth`, `early\\nwithdrawal`) and page breaks to challenge lexical boundary detection.
+FinGuard-AI is evaluated against a 100-contract multi-page adversarial stress-test dataset (`data/benchmark/`) compiled via ReportLab. Predatory traps are disguised within authentic corporate boilerplate covenants with deliberate cross-line hyphenations (`18-\nmonth`, `early\nwithdrawal`) and page breaks to challenge lexical boundary detection.
 
 ### Empirical Audit Matrix (100 PDF Evaluation)
 
@@ -221,7 +221,7 @@ finguard-ai/
 <TICK_PS>
 # Create and activate virtual environment
 python -m venv .venv
-.\\.venv\\Scripts\\Activate.ps1
+.\.venv\Scripts\Activate.ps1
 
 # Install core runtime and test dependencies
 pip install -r requirements.txt
@@ -231,38 +231,38 @@ pip install pypdf reportlab
 ### Step 2: Code Hygiene & Strict Static Typing Verification
 <TICK_PS>
 # Lint and format inspection
-.\\.venv\\Scripts\\python.exe -m ruff check --fix src tests scripts
-.\\.venv\\Scripts\\python.exe -m ruff format src tests scripts
+.\.venv\Scripts\python.exe -m ruff check --fix src tests scripts
+.\.venv\Scripts\python.exe -m ruff format src tests scripts
 
 # Strict static type verification
-.\\.venv\\Scripts\\python.exe -m mypy src
+.\.venv\Scripts\python.exe -m mypy src
 <TICK>
 
 ### Step 3: Execute Statutory Test Suite
 <TICK_PS>
-.\\.venv\\Scripts\\python.exe -m pytest -v --tb=short --cov=src tests/
+.\.venv\Scripts\python.exe -m pytest -v --tb=short --cov=src tests/
 <TICK>
 *Expected Result:* 27/27 tests passed in $< 0.70\text{s}$ with total coverage $\ge 82.4\%$.
 
 ### Step 4: Generate Adversarial Dataset (100 Benchmark PDFs)
 <TICK_PS>
-.\\.venv\\Scripts\\python.exe scripts/generate_adversarial_dataset.py
+.\.venv\Scripts\python.exe scripts/generate_adversarial_dataset.py
 <TICK>
 *Expected Result:* Compiles 80 adversarial scam traps and 20 negative controls into `data/benchmark/`.
 
 ### Step 5: Execute Institutional Stress-Test Benchmark
 <TICK_PS>
-.\\.venv\\Scripts\\python.exe scripts/run_benchmark.py
+.\.venv\Scripts\python.exe scripts/run_benchmark.py
 <TICK>
 *Expected Result:* Evaluates 100 PDFs, confirming Recall: 100.0%, Precision: 100.0%, FPR: 0.0%, and Latency: $\approx 6.54\text{ ms/doc}$.
 
 ### Step 6: Launch Production Services
 <TICK_PS>
 # Tab 1: Launch FastAPI Gateway (@Port 8000)
-.\\.venv\\Scripts\\python.exe -m uvicorn src.api.app:app --host 127.0.0.1 --port 8000 --reload
+.\.venv\Scripts\python.exe -m uvicorn src.api.app:app --host 127.0.0.1 --port 8000 --reload
 
 # Tab 2: Launch Streamlit Compliance Cockpit (@Port 8501)
-.\\.venv\\Scripts\\python.exe -m streamlit run src/ui/dashboard.py --server.port 8501
+.\.venv\Scripts\python.exe -m streamlit run src/ui/dashboard.py --server.port 8501
 <TICK>
 
 ---
