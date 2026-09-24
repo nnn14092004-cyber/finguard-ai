@@ -1,13 +1,11 @@
-﻿# Version Control & Environments
-.git
+﻿.git
 .gitignore
-.github
-.venv
+.dockerignore
+.idea/
+.vscode/
+.venv/
 venv/
-ENV/
 env/
-
-# Python Bytecode & Cache
 __pycache__/
 *.py[cod]
 *$py.class
@@ -15,16 +13,11 @@ __pycache__/
 .pytest_cache/
 .coverage
 htmlcov/
-dist/
-build/
-*.egg-info/
-
-# Local Configurations & Secrets
+nosetests.xml
+coverage.xml
+data/benchmark/*.pdf
+benchmark_results.json
+specimens/*.pdf
 .env
+.env*.local
 *.log
-
-# IDE & OS Metadata
-.vscode/
-.idea/
-.DS_Store
-Thumbs.db
