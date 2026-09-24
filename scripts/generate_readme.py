@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-# Using raw string template with balanced HTML line breaks for GitHub SVG rendering
+# Using raw string template with balanced 2x2 matrix layout for GitHub SVG rendering
 RAW_TEMPLATE = r"""# FinGuard-AI: Institutional Contract Compliance & Regulatory Audit Pipeline
 
 [![Compliance CI](https://github.com/nnn14092004-cyber/finguard-ai/actions/workflows/compliance_ci.yml/badge.svg)](https://github.com/nnn14092004-cyber/finguard-ai/actions)
@@ -33,11 +33,16 @@ The inspection core directly references and enforces four governing pillars of i
 
 <TICK_MERMAID>
 flowchart TD
-    subgraph Regulatory_Pillars [FinGuard-AI Statutory Enforcement Core]
-        P1["<b>1. SEC Howey Doctrine</b><br/>15 U.S.C. § 77e<br/>Unregistered Securities & Passive Reliance"]
-        P2["<b>2. FTC Koscot & Amway Standards</b><br/>Pyramid Architecture & Downline Bonuses"]
-        P3["<b>3. FATF & FCA High-Yield Standards</b><br/>Velocity, Capital Guarantees & AML Evasion"]
-        P4["<b>4. Unfair Contract Terms & Jurisdiction</b><br/>Lockups, Exit Penalties & Secrecy Havens"]
+    subgraph Framework ["FinGuard-AI Statutory Enforcement Core"]
+        direction TB
+        subgraph Col1 ["Securities & Anti-Pyramid"]
+            P1["Pillar I: SEC Howey Doctrine<br/>15 U.S.C. 77e<br/>Unregistered Securities"]
+            P2["Pillar II: FTC Koscot Rules<br/>86 F.T.C. 1106<br/>Anti-Pyramid Architecture"]
+        end
+        subgraph Col2 ["Yield Velocity & Legal Fairness"]
+            P3["Pillar III: FATF & FCA Standards<br/>HYIP Velocity Red Flags<br/>AML & Travel Rule Evasion"]
+            P4["Pillar IV: Unfair Contract Terms<br/>Predatory Lockup Intervals<br/>Offshore Forum Evasion"]
+        end
     end
 <TICK>
 
