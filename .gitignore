@@ -75,3 +75,9 @@ ehthumbs.db
 batch_audit_summary.json
 audit_manifest.json
 specimens/*.pdf
+
+# FinGuard-AI Benchmark Artifacts & Ingested Binary Streams
+benchmark_results.json
+data/benchmark/*.pdf
+data/benchmark/ground_truth.json
+!data/**/.gitkeep
