@@ -1,11 +1,12 @@
-"""Executive compliance dashboard for financial instrument audits."""
+"""Institutional compliance auditing cockpit and risk telemetry interface."""
 
 from __future__ import annotations
 
 import pathlib
 import sys
+import time
 
-# Ensure repository root is on sys.path for standalone Streamlit execution
+# Ensure repository root is discoverable on sys.path
 ROOT_DIR = pathlib.Path(__file__).resolve().parent.parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
@@ -13,110 +14,134 @@ if str(ROOT_DIR) not in sys.path:
 import plotly.graph_objects as go
 import streamlit as st
 
-from src.domain.enums import RiskTier
+from src.domain.enums import RegulatoryFramework, RiskTier, Severity
 from src.domain.models import AuditAssessmentReport
+from src.ingestion.normalizer import extract_text_from_pdf
 from src.pipeline import FinGuardPipeline
+from src.reporting.pdf_generator import ForensicReportGenerator
 
 AUDIT_PRESETS: dict[str, str] = {
-    "Aura Neural Protocol (Multi-Tier Recruitment)": (
-        "AURA NEURAL PROTOCOL:\n"
-        "Participants deposit capital into our autonomous liquidity allocation matrix.\n"
+    "Aura Neural Protocol (Multi-Tier Recruitment Trap)": (
+        "AURA NEURAL PROTOCOL - CONFIDENTIAL OFFERING MEMORANDUM\n"
+        "1. Capital Deployment & Target Yield:\n"
+        "Participants deposit digital assets into our autonomous algorithmic liquidity allocation matrix. "
         "The protocol targets an algorithmic distribution benchmark yielding 150 basis points daily, "
         "backed by autonomous arbitrage with complete insulation from downside principal volatility.\n"
-        "No trading expertise is required by passive participants.\n"
-        "Earn returns through our multi-tier referral commission structure with downline investment "
-        "volume bonuses and a binary bonus on newly recruited capital.\n"
-        "Participants must purchase an AI license package to qualify.\n"
-        "Mandatory lock-up period of 24 months applies with an early withdrawal penalty of 40%.\n"
-        "Withdrawals are conditioned upon active referrals.\n"
-        "Governed by the laws of Seychelles, arbitration in Vanuatu."
+        "2. Passive Participation & Management:\n"
+        "No trading expertise is required by passive participants. All execution is handled entirely "
+        "by our specialized quantitative algorithmic team.\n"
+        "3. Network Incentives & Multi-Tier Compensation:\n"
+        "Participants earn revenue through our multi-tier referral commission structure with downline investment "
+        "volume bonuses and a binary bonus on newly recruited capital. Participants must purchase an AI license package to qualify.\n"
+        "4. Liquidity Terms & Jurisdiction:\n"
+        "Mandatory lock-up period of 24 months applies with an early withdrawal penalty of 40%. "
+        "Withdrawals are conditioned upon maintaining active referrals. "
+        "This instrument is governed by the laws of Seychelles, with mandatory confidential arbitration in Vanuatu."
     ),
-    "Synapse Quantum Vault (Guaranteed High Yield)": (
+    "Synapse Quantum Vault (Guaranteed Yield & Unhosted Wallets)": (
         "SYNAPSE QUANTUM VAULT - PARTICIPATION TERMS\n\n"
         "1. Capital Allocation & Yield:\n"
-        "Investors allocate funds into our automated liquidity allocation pool, fully managed by our automated AI neural matrix.\n"
+        "Investors allocate funds into our automated liquidity allocation pool, fully managed by our automated neural matrix.\n"
         "Participants remain completely passive and receive a guaranteed 2.5% daily return with 100% capital guaranteed against principal volatility.\n\n"
-        "2. Referral Commissions:\n"
-        "Members earn multi-tier referral commissions of 15% on level 1 and 5% on level 2 downline investment volume.\n\n"
-        "3. Liquidity Terms:\n"
-        "A mandatory lock-up period of 18 months applies. Early withdrawal penalty of 40% applies.\n"
+        "2. Referral Commissions & Routing:\n"
+        "Members earn multi-tier referral commissions of 15% on level 1 and 5% on level 2 downline investment volume.\n"
+        "Participants deposit capital directly to anonymous personal crypto wallet without KYC.\n\n"
+        "3. Liquidity Terms & Discretion:\n"
+        "A mandatory lock-up period of 18 months applies. Early withdrawal penalty fee strips 40% of initial principal.\n"
         "Management reserves the right to modify terms at any time without prior notice at its sole discretion.\n"
         "This agreement is governed by the laws of Vanuatu."
     ),
-    "Howey Passive Syndicate (Unregistered Securities)": (
-        "INVESTMENT PARTICIPATION AGREEMENT\n\n"
-        "1. Pooling of Capital:\n"
-        "Investors provide capital into our collective pooling vault. All trading strategies and asset allocations "
-        "are executed entirely by our algorithmic management team.\n\n"
-        "2. Passive Entitlement:\n"
-        "Participants remain completely passive investors while enjoying regular dividend distributions "
-        "derived solely from the proprietary algorithmic trading efforts of the issuer syndicate."
+    "Series A Preferred Stock (Standard Commercial Baseline)": (
+        "SERIES A PREFERRED SHAREHOLDERS AGREEMENT:\n"
+        "1. Founder Equity Lock-up: Founders agree to a standard founder share lock-up following "
+        "the execution of this Agreement, subject to a four-year linear vesting schedule with a one-year cliff.\n"
+        "2. Transfer Restrictions: No Shareholder shall transfer, pledge, or encumber common stock without "
+        "prior written consent of the Board of Directors representing a qualified corporate majority.\n"
+        "3. Applicable Jurisdiction: Governed in accordance with the laws of the State of Delaware, United States."
     ),
-    "Enterprise Cloud SLA (Commercial Standard)": (
-        "ENTERPRISE CLOUD SERVICE LEVEL AGREEMENT (SLA)\n\n"
-        "1. Service Commitment:\n"
-        "Provider guarantees 99.9% uptime for provisioned compute infrastructure during each monthly billing cycle.\n\n"
-        "2. Billing & Invoicing:\n"
-        "Customer agrees to remit recurring monthly service fees within thirty (30) days of receipt of invoice.\n\n"
-        "3. Termination for Convenience:\n"
-        "Either party may terminate this Agreement without cause upon providing sixty (60) days advance written notice.\n\n"
-        "4. Governing Law & Dispute Resolution:\n"
-        "This instrument is governed by and construed in accordance with the commercial laws of the State of Delaware, United States."
+    "Enterprise Software Service Agreement (Negative Control)": (
+        "MASTER ENTERPRISE SOFTWARE SUBSCRIPTION AGREEMENT:\n"
+        "1. Service Availability: Provider shall maintain monthly system availability of at least 99.9%.\n"
+        "2. Tiered Platform License: Customer is licensed for up to 500 concurrent administrative seats.\n"
+        "3. Bilateral Termination: Either party may terminate upon 30 days written notice for uncured material breach.\n"
+        "4. Governing Law: This Agreement is governed by the commercial laws of England and Wales."
     ),
 }
 
 TIER_COLORS = {
-    RiskTier.GREEN: "#10B981",
-    RiskTier.YELLOW: "#F59E0B",
-    RiskTier.ORANGE: "#F97316",
-    RiskTier.RED_FLAG: "#EF4444",
+    RiskTier.GREEN: "#10b981",
+    RiskTier.YELLOW: "#f59e0b",
+    RiskTier.ORANGE: "#f97316",
+    RiskTier.RED_FLAG: "#ef4444",
 }
 
-TIER_BADGES = {
-    RiskTier.GREEN: "PASS / LOW RISK",
-    RiskTier.YELLOW: "CAUTIONARY REVIEW",
+TIER_DESCRIPTIONS = {
+    RiskTier.GREEN: "COMMERCIAL BASELINE (LOW RISK)",
+    RiskTier.YELLOW: "CAUTIONARY REVIEW REQUIRED",
     RiskTier.ORANGE: "HIGH REGULATORY SUSPICION",
     RiskTier.RED_FLAG: "CRITICAL REGULATORY HAZARD",
 }
 
 
 def configure_page_layout() -> None:
-    """Configures Streamlit page metadata and layout parameters."""
+    """Configures application metadata and institutional stylesheet."""
     st.set_page_config(
-        page_title="FinGuard Compliance Auditing Cockpit",
-        page_icon="🛡️",
+        page_title="FinGuard-AI Compliance Auditing Cockpit",
         layout="wide",
         initial_sidebar_state="expanded",
     )
     st.markdown(
         """
         <style>
+        .main {
+            background-color: #0b0f19;
+        }
         .metric-card {
-            background-color: #1E293B;
+            background-color: #151d30;
             border-radius: 6px;
-            padding: 16px 20px;
-            border: 1px solid #334155;
+            padding: 14px 18px;
+            border: 1px solid #1e293b;
             margin-bottom: 12px;
         }
         .metric-label {
-            font-size: 0.8rem;
-            color: #94A3B8;
+            font-size: 0.75rem;
+            color: #94a3b8;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
         .metric-value {
-            font-size: 2.0rem;
+            font-size: 1.8rem;
             font-weight: 700;
             margin: 4px 0;
+            font-family: 'Courier New', monospace;
         }
-        .verbatim-box {
-            background-color: #0F172A;
-            border-left: 3px solid #EF4444;
+        .metric-caption {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+        .tier-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+        .badge-green { background-color: #064e3b; color: #34d399; border: 1px solid #059669; }
+        .badge-yellow { background-color: #713f12; color: #fde047; border: 1px solid #ca8a04; }
+        .badge-orange { background-color: #7c2d12; color: #fdba74; border: 1px solid #ea580c; }
+        .badge-red { background-color: #7f1d1d; color: #fca5a5; border: 1px solid #dc2626; }
+        .evidence-quote-box {
+            background-color: #0f172a;
+            border-left: 3px solid #ef4444;
             padding: 10px 14px;
             border-radius: 0 4px 4px 0;
             font-family: monospace;
-            color: #F8FAFC;
+            font-size: 0.85rem;
+            color: #f1f5f9;
             margin: 8px 0;
         }
         </style>
@@ -127,114 +152,18 @@ def configure_page_layout() -> None:
 
 @st.cache_resource
 def get_pipeline() -> FinGuardPipeline:
-    """Returns singleton pipeline instance."""
+    """Initializes and returns cached pipeline instance."""
     return FinGuardPipeline()
 
 
-def render_sidebar() -> tuple[str, str]:
-    """Renders document input controls and scenario selection."""
-    st.sidebar.title("FinGuard Engine")
-    st.sidebar.caption("Financial Compliance Assessment Interface")
-    st.sidebar.markdown("---")
-
-    st.sidebar.subheader("Benchmark Scenarios")
-    selected_preset = st.sidebar.selectbox(
-        "Select Agreement Template:",
-        options=["Custom Document Upload / Text"] + list(AUDIT_PRESETS.keys()),
-        index=1,
-    )
-
-    st.sidebar.subheader("Document Ingestion")
-    uploaded_file = st.sidebar.file_uploader(
-        "Upload Agreement (.txt, .md):",
-        type=["txt", "md"],
-        help="Upload contractual plain text or Markdown agreement.",
-    )
-
-    raw_text: str = ""
-    file_name: str = "custom_contract.txt"
-
-    if uploaded_file is not None:
-        raw_text = uploaded_file.read().decode("utf-8", errors="replace")
-        file_name = uploaded_file.name
-    elif selected_preset != "Custom Document Upload / Text":
-        raw_text = AUDIT_PRESETS[selected_preset]
-        file_name = f"{selected_preset.split(' ')[0].lower()}_instrument.txt"
-    else:
-        raw_text = st.sidebar.text_area(
-            "Contract Content:",
-            height=200,
-            placeholder="Paste contract text for evaluation...",
-        )
-
-    st.sidebar.markdown("---")
-    st.sidebar.caption(
-        "Codified Frameworks: SEC Howey (1946), FTC Koscot, FATF HYIP Benchmarks, Unfair Terms."
-    )
-
-    return raw_text, file_name
-
-
-def render_executive_metrics(report: AuditAssessmentReport) -> None:
-    """Renders high-level audit KPIs."""
-    tier_color = TIER_COLORS.get(report.risk_tier, "#94A3B8")
-    tier_badge = TIER_BADGES.get(report.risk_tier, str(report.risk_tier.value))
-
-    col1, col2, col3, col4 = st.columns(4)
-
-    with col1:
-        st.markdown(
-            f"""
-            <div class="metric-card">
-                <div class="metric-label">Suspicion Score (S)</div>
-                <div class="metric-value" style="color: {tier_color};">{report.suspicion_score} / 100</div>
-                <span style="font-size: 0.75rem; color: #94A3B8;">Formula: min(100, sum(w_i * c_i))</span>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-    with col2:
-        st.markdown(
-            f"""
-            <div class="metric-card">
-                <div class="metric-label">Assigned Risk Tier</div>
-                <div class="metric-value" style="color: {tier_color}; font-size: 1.4rem; line-height: 2.0rem;">
-                    {report.risk_tier.value}
-                </div>
-                <span style="font-size: 0.75rem; color: {tier_color}; font-weight: 600;">{tier_badge}</span>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-    with col3:
-        st.markdown(
-            f"""
-            <div class="metric-card">
-                <div class="metric-label">Infractions Flagged</div>
-                <div class="metric-value" style="color: #F8FAFC;">{report.total_findings}</div>
-                <span style="font-size: 0.75rem; color: #94A3B8;">Heuristic & Semantic Findings</span>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-    with col4:
-        st.markdown(
-            f"""
-            <div class="metric-card">
-                <div class="metric-label">Remediation Directives</div>
-                <div class="metric-value" style="color: #38BDF8;">{len(report.remediation_actions)}</div>
-                <span style="font-size: 0.75rem; color: #94A3B8;">Statutory Action Items</span>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+@st.cache_resource
+def get_report_generator() -> ForensicReportGenerator:
+    """Initializes and returns cached forensic PDF dossier generator."""
+    return ForensicReportGenerator()
 
 
 def build_risk_radar_chart(report: AuditAssessmentReport) -> go.Figure:
-    """Constructs an institutional 4D polar radar chart for decomposed risk vectors."""
+    """Constructs a 4D polar radar chart mapping decomposed contractual exposure."""
     categories = [
         "Yield Velocity Risk",
         "Structural / MLM Risk",
@@ -249,51 +178,51 @@ def build_risk_radar_chart(report: AuditAssessmentReport) -> go.Figure:
         float(v.legal_risk),
     ]
 
-    # Close the radar loop
     categories_closed = categories + [categories[0]]
     values_closed = values + [values[0]]
     baseline_safe = [25.0, 25.0, 25.0, 25.0, 25.0]
 
-    tier_color = TIER_COLORS.get(report.risk_tier, "#EF4444")
+    tier_color = TIER_COLORS.get(report.risk_tier, "#ef4444")
     fill_rgba = (
-        "rgba(239, 68, 68, 0.45)"
+        "rgba(239, 68, 68, 0.35)"
         if report.risk_tier == RiskTier.RED_FLAG
         else (
-            "rgba(249, 115, 22, 0.45)"
+            "rgba(249, 115, 22, 0.35)"
             if report.risk_tier == RiskTier.ORANGE
             else (
-                "rgba(245, 158, 11, 0.40)"
+                "rgba(245, 158, 11, 0.30)"
                 if report.risk_tier == RiskTier.YELLOW
-                else "rgba(16, 185, 129, 0.35)"
+                else "rgba(16, 185, 129, 0.25)"
             )
         )
     )
 
     fig = go.Figure()
 
-    # Statutory Commercial Safe Baseline Envelope (<= 25%)
+    # Commercial Baseline Envelope (Safe Threshold <= 25%)
     fig.add_trace(
         go.Scatterpolar(
             r=baseline_safe,
             theta=categories_closed,
             fill="toself",
-            fillcolor="rgba(16, 185, 129, 0.08)",
-            line=dict(color="#10B981", width=1.5, dash="dash"),
-            name="Safe Commercial Threshold (<= 25%)",
+            fillcolor="rgba(16, 185, 129, 0.05)",
+            line=dict(color="#10b981", width=1.5, dash="dash"),
+            name="Commercial Baseline Ceiling (25%)",
             hoverinfo="text",
-            hovertext="Statutory Baseline Ceiling (25%)",
+            hovertext="Safe Commercial Threshold (<= 25%)",
         )
     )
 
-    # Assessed Contract Risk Polygon
+    # Assessed Contract Risk Vector
     fig.add_trace(
         go.Scatterpolar(
             r=values_closed,
             theta=categories_closed,
             fill="toself",
             fillcolor=fill_rgba,
-            line=dict(color=tier_color, width=3.0),
-            name=f"Assessed Risk Vector ({report.risk_tier.value})",
+            line=dict(color=tier_color, width=2.5),
+            marker=dict(size=6, color=tier_color),
+            name=f"Assessed Exposure ({report.risk_tier.value})",
             hoverinfo="r+theta",
         )
     )
@@ -305,141 +234,308 @@ def build_risk_radar_chart(report: AuditAssessmentReport) -> go.Figure:
                 range=[0, 100],
                 tickvals=[25, 50, 75, 100],
                 ticktext=["25%", "50%", "75%", "100%"],
-                tickfont=dict(size=10, color="#94A3B8"),
-                gridcolor="#334155",
-                linecolor="#475569",
+                tickfont=dict(size=9, color="#64748b"),
+                gridcolor="#1e293b",
+                linecolor="#334155",
             ),
             angularaxis=dict(
-                tickfont=dict(size=11, color="#F1F5F9", family="sans-serif"),
-                gridcolor="#334155",
-                linecolor="#475569",
+                tickfont=dict(size=10, color="#cbd5e1", family="sans-serif"),
+                gridcolor="#1e293b",
+                linecolor="#334155",
             ),
-            bgcolor="rgba(15, 23, 42, 0.65)",
+            bgcolor="rgba(15, 23, 42, 0.4)",
         ),
         showlegend=True,
         legend=dict(
             orientation="h",
             yanchor="bottom",
-            y=-0.28,
+            y=-0.25,
             xanchor="center",
             x=0.5,
-            font=dict(size=11, color="#CBD5E1"),
+            font=dict(size=10, color="#94a3b8"),
         ),
-        margin=dict(l=40, r=40, t=25, b=45),
+        margin=dict(l=40, r=40, t=20, b=40),
         paper_bgcolor="rgba(0, 0, 0, 0)",
         plot_bgcolor="rgba(0, 0, 0, 0)",
-        height=380,
+        height=320,
     )
     return fig
 
 
-def render_risk_vector_telemetry(report: AuditAssessmentReport) -> None:
-    """Renders decomposed orthogonal risk axes with interactive Plotly Radar Chart."""
-    st.subheader("Orthogonal Regulatory Risk Decomposition")
-    v = report.risk_vector
+def render_sidebar() -> tuple[str, str]:
+    """Renders document input controls and scenario templates."""
+    st.sidebar.title("FinGuard-AI Engine")
+    st.sidebar.caption("Regulatory Compliance Examination Interface")
+    st.sidebar.markdown("---")
 
-    radar_col, bar_col = st.columns([1.25, 1.0], gap="large")
-
-    with radar_col:
-        radar_fig = build_risk_radar_chart(report)
-        st.plotly_chart(radar_fig, use_container_width=True)
-
-    with bar_col:
-        st.markdown("<div style='padding-top: 10px;'></div>", unsafe_allow_html=True)
-
-        st.caption("YIELD VELOCITY RISK")
-        st.progress(v.yield_risk / 100.0)
-        st.write(f"**{v.yield_risk}%** - Guaranteed Yields & FATF HYIP Benchmarks")
-
-        st.caption("STRUCTURAL / MLM RISK")
-        st.progress(v.structural_risk / 100.0)
-        st.write(f"**{v.structural_risk}%** - SEC Howey Pooling & FTC Koscot Multi-Tier")
-
-        st.caption("LIQUIDITY LOCKUP RISK")
-        st.progress(v.liquidity_risk / 100.0)
-        st.write(f"**{v.liquidity_risk}%** - Capital Freezes & Exit Penalties")
-
-        st.caption("LEGAL JURISDICTION RISK")
-        st.progress(v.legal_risk / 100.0)
-        st.write(f"**{v.legal_risk}%** - Offshore Secrecy Venues & Abusive Terms")
-
-
-def render_audit_details(report: AuditAssessmentReport) -> None:
-    """Renders tabs containing itemized findings and remediation actions."""
-    st.markdown("---")
-    tab_findings, tab_remediation, tab_json = st.tabs(
-        ["Clause Findings", "Remediation Directives", "Raw Payload"]
+    st.sidebar.subheader("Document Presets")
+    selected_preset = st.sidebar.selectbox(
+        "Institutional Benchmark Scenarios:",
+        options=["Custom Document Ingestion"] + list(AUDIT_PRESETS.keys()),
+        index=1,
     )
 
-    with tab_findings:
-        if not report.findings and not report.semantic_findings:
-            st.success(
-                "No statutory violations detected. Instrument aligns with standard commercial baselines."
-            )
+    st.sidebar.subheader("File Ingestion")
+    uploaded_file = st.sidebar.file_uploader(
+        "Upload Agreement (.pdf, .txt, .md):",
+        type=["pdf", "txt", "md"],
+        help="In-memory extraction pipeline with zero persistent disk footprint.",
+    )
+
+    raw_text: str = ""
+    file_name: str = "custom_contract.txt"
+
+    if uploaded_file is not None:
+        file_name = uploaded_file.name
+        file_bytes = uploaded_file.read()
+        if file_name.lower().endswith(".pdf"):
+            with st.spinner("Extracting text streams from PDF..."):
+                try:
+                    raw_text = extract_text_from_pdf(file_bytes)
+                except Exception as exc:
+                    st.sidebar.error(f"PDF extraction error: {exc}")
         else:
-            for idx, finding in enumerate(report.findings, start=1):
-                rule_id = getattr(finding, "rule_id", "FLAG")
-                rule_name = getattr(finding, "rule_name", "Compliance Finding")
-                weight = getattr(finding, "weight", 0)
-                matched = getattr(finding, "matched_text", "")
-                advice = getattr(finding, "remediation_advice", "")
-                framework = getattr(finding, "regulatory_framework", "")
-                category = getattr(finding, "category", "General")
+            raw_text = file_bytes.decode("utf-8", errors="replace")
+    elif selected_preset != "Custom Document Ingestion":
+        raw_text = AUDIT_PRESETS[selected_preset]
+        file_name = f"{selected_preset.split(' ')[0].lower()}_agreement.txt"
 
-                with st.expander(
-                    f"Finding #{idx}: [{rule_id}] {rule_name} (+{weight} pts)", expanded=True
-                ):
-                    st.write(f"**Framework:** `{framework}` | **Category:** `{category}`")
-                    st.markdown(
-                        f'<div class="verbatim-box">"{matched}"</div>', unsafe_allow_html=True
-                    )
-                    st.write(f"**Remediation Action:** {advice}")
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("### Governing Frameworks")
+    st.sidebar.caption(
+        "Pillar I: SEC Howey Doctrine (15 U.S.C. 77e)\n\n"
+        "Pillar II: FTC Koscot & Amway Standards\n\n"
+        "Pillar III: FATF & FCA High-Yield Standards\n\n"
+        "Pillar IV: Cross-Border Unfair Contract Terms"
+    )
 
-            for idx, sf in enumerate(report.semantic_findings, start=len(report.findings) + 1):
-                topic = getattr(sf, "clause_topic", getattr(sf, "category", "Semantic Finding"))
-                penalty = getattr(sf, "penalty_weight", getattr(sf, "weight", 20))
-                text = getattr(sf, "context_snippet", getattr(sf, "matched_text", ""))
-                guidance = getattr(
-                    sf, "remediation_guidance", getattr(sf, "remediation_advice", "")
-                )
+    return raw_text, file_name
 
-                with st.expander(
-                    f"Finding #{idx}: [SEMANTIC] {topic} (+{penalty} pts)", expanded=True
-                ):
-                    st.markdown(f'<div class="verbatim-box">"{text}"</div>', unsafe_allow_html=True)
-                    st.write(f"**Deception Analysis:** {guidance}")
 
-    with tab_remediation:
-        st.subheader("Required Statutory Remediation Actions")
-        for idx, action in enumerate(report.remediation_actions, start=1):
-            st.markdown(f"**{idx}.** {action}")
+def render_telemetry_kpis(report: AuditAssessmentReport, latency_ms: float) -> None:
+    """Renders primary regulatory metrics in institutional KPI format."""
+    tier = report.risk_tier
+    tier_color = TIER_COLORS.get(tier, "#94a3b8")
+    badge_class = {
+        RiskTier.GREEN: "badge-green",
+        RiskTier.YELLOW: "badge-yellow",
+        RiskTier.ORANGE: "badge-orange",
+        RiskTier.RED_FLAG: "badge-red",
+    }.get(tier, "badge-red")
+    tier_desc = TIER_DESCRIPTIONS.get(tier, tier.value)
 
-    with tab_json:
-        st.json(report.model_dump())
+    c1, c2, c3, c4 = st.columns(4)
+
+    with c1:
+        st.markdown(
+            f"""
+            <div class="metric-card">
+                <div class="tier-badge {badge_class}">{tier.value}</div>
+                <div class="metric-label">Suspicion Score (S)</div>
+                <div class="metric-value" style="color: {tier_color};">{report.suspicion_score} / 100</div>
+                <div class="metric-caption">{tier_desc}</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    with c2:
+        st.markdown(
+            f"""
+            <div class="metric-card">
+                <div class="metric-label">Infractions Flagged</div>
+                <div class="metric-value" style="color: #f8fafc;">{report.total_findings}</div>
+                <div class="metric-caption">Deterministic & Semantic Findings</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    with c3:
+        st.markdown(
+            f"""
+            <div class="metric-card">
+                <div class="metric-label">Processing Latency</div>
+                <div class="metric-value" style="color: #38bdf8;">{latency_ms:.2f} ms</div>
+                <div class="metric-caption">Sub-Second Execution SLA</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    with c4:
+        st.markdown(
+            f"""
+            <div class="metric-card">
+                <div class="metric-label">Remediation Directives</div>
+                <div class="metric-value" style="color: #a78bfa;">{len(report.remediation_actions)}</div>
+                <div class="metric-caption">Actionable Compliance Items</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+
+def render_findings_tab(report: AuditAssessmentReport) -> None:
+    """Renders itemized legal infractions and evidentiary text snippets."""
+    if not report.findings and not report.semantic_findings:
+        st.success(
+            "Zero statutory violations detected. Instrument aligns with standard commercial contracting baselines."
+        )
+        return
+
+    for idx, finding in enumerate(report.findings, start=1):
+        rule_id = getattr(finding, "rule_id", "RULE")
+        rule_name = getattr(finding, "rule_name", "Statutory Infraction")
+        weight = getattr(finding, "weight", 0)
+        matched_text = getattr(finding, "matched_text", "")
+        remediation = getattr(finding, "remediation_advice", "")
+        framework = getattr(finding, "regulatory_framework", "")
+        framework_val = (
+            framework.value if isinstance(framework, RegulatoryFramework) else str(framework)
+        )
+
+        severity = getattr(finding, "severity", "")
+        severity_val = severity.value if isinstance(severity, Severity) else str(severity)
+
+        with st.expander(
+            f"Infraction #{idx}: [{rule_id}] {rule_name} (+{weight} pts)",
+            expanded=True,
+        ):
+            meta_col1, meta_col2 = st.columns([1, 1])
+            with meta_col1:
+                st.write(f"**Regulatory Framework:** `{framework_val}`")
+            with meta_col2:
+                st.write(f"**Statutory Severity:** `{severity_val}`")
+
+            st.markdown(
+                f'<div class="evidence-quote-box">"{matched_text}"</div>',
+                unsafe_allow_html=True,
+            )
+            st.write(f"**Prescribed Remediation:** {remediation}")
+
+    for idx, sf in enumerate(report.semantic_findings, start=len(report.findings) + 1):
+        topic = getattr(sf, "clause_topic", getattr(sf, "category", "Semantic Infraction"))
+        penalty = getattr(sf, "penalty_weight", getattr(sf, "weight", 20))
+        extracted = getattr(
+            sf, "context_snippet", getattr(sf, "extracted_text", getattr(sf, "matched_text", ""))
+        )
+        guidance = getattr(sf, "remediation_guidance", getattr(sf, "remediation_advice", ""))
+
+        with st.expander(
+            f"Infraction #{idx}: [SEMANTIC] {topic} (+{penalty} pts)",
+            expanded=True,
+        ):
+            st.markdown(
+                f'<div class="evidence-quote-box">"{extracted}"</div>',
+                unsafe_allow_html=True,
+            )
+            st.write(f"**Deception Analysis & Remediation:** {guidance}")
 
 
 def main() -> None:
-    """Application entry point."""
+    """Primary application orchestrator."""
     configure_page_layout()
+    pipeline = get_pipeline()
+    report_generator = get_report_generator()
+
     raw_text, file_name = render_sidebar()
 
-    st.title("FinGuard Compliance Auditing Cockpit")
+    st.title("Financial Instrument Regulatory Compliance Cockpit")
     st.markdown(
-        "Automated regulatory compliance assessment and multi-dimensional risk matrix synthesis for "
-        "cross-border investment instruments, syndication agreements, and commercial agreements."
+        "Automated statutory auditing engine evaluating high-yield agreements, syndication contracts, "
+        "and promotional disclosures against SEC, FTC, FATF, and FCA enforcement doctrines."
     )
 
-    if not raw_text.strip():
-        st.info("Select a preset scenario or supply contract text in the sidebar to run audit.")
-        return
+    contract_input = st.text_area(
+        "Contractual Disclosures & Operative Provisions:",
+        value=raw_text,
+        height=180,
+        placeholder="Upload document in sidebar or paste text content here...",
+    )
 
-    pipeline = get_pipeline()
-    report = pipeline.process_document(raw_text=raw_text, file_name=file_name)
+    action_col1, action_col2 = st.columns([2, 1])
+    with action_col1:
+        run_audit = st.button(
+            "Execute Regulatory Audit",
+            type="primary",
+            width="stretch",
+        )
+    with action_col2:
+        export_placeholder = st.empty()
 
-    render_executive_metrics(report)
-    st.markdown(f"**Executive Verdict:** {report.executive_summary}")
-    render_risk_vector_telemetry(report)
-    render_audit_details(report)
+    if run_audit and contract_input.strip():
+        start_time = time.perf_counter()
+        with st.spinner("Executing statutory heuristic scan and vector decomposition..."):
+            audit_result = pipeline.process_document(raw_text=contract_input, file_name=file_name)
+        elapsed_ms = (time.perf_counter() - start_time) * 1000.0
+
+        st.session_state["active_report"] = audit_result
+        st.session_state["active_latency_ms"] = elapsed_ms
+
+    if "active_report" in st.session_state:
+        active_report: AuditAssessmentReport = st.session_state["active_report"]
+        latency_ms: float = st.session_state.get("active_latency_ms", 0.0)
+
+        # Generate court-admissible PDF bytes
+        pdf_bytes = report_generator.generate_pdf_bytes(active_report)
+        export_placeholder.download_button(
+            label="Export Forensic PDF Dossier",
+            data=pdf_bytes,
+            file_name=f"FinGuard_Forensic_Dossier_{active_report.document_id[:8]}.pdf",
+            mime="application/pdf",
+            width="stretch",
+            help="Generates an institutional audit dossier with SHA-256 cryptographic provenance.",
+        )
+
+        st.markdown("---")
+        render_telemetry_kpis(active_report, latency_ms)
+
+        # Decomposed Risk Vector & Executive Summary
+        chart_col, summary_col = st.columns([1.1, 1.0], gap="medium")
+
+        with chart_col:
+            st.subheader("Orthogonal 4D Risk Exposure")
+            st.plotly_chart(build_risk_radar_chart(active_report), use_container_width=True)
+
+        with summary_col:
+            st.subheader("Executive Auditor Summary")
+            st.info(active_report.executive_summary)
+
+            v = active_report.risk_vector
+            st.markdown(
+                f"""
+                - **Yield Velocity Risk:** `{v.yield_risk}/100`
+                - **Structural / MLM Risk:** `{v.structural_risk}/100`
+                - **Liquidity Lockup Risk:** `{v.liquidity_risk}/100`
+                - **Jurisdiction Evasion Risk:** `{v.legal_risk}/100`
+                """
+            )
+
+        # Detailed Breakdown Tabs
+        st.markdown("---")
+        tab_findings, tab_directives, tab_payload = st.tabs(
+            [
+                "Itemized Infractions & Evidence",
+                "Statutory Remediation Directives",
+                "Audit Artifact Data",
+            ]
+        )
+
+        with tab_findings:
+            render_findings_tab(active_report)
+
+        with tab_directives:
+            st.subheader("Actionable Governance Directives")
+            if not active_report.remediation_actions:
+                st.write("No statutory remediation actions prescribed.")
+            else:
+                for idx, action in enumerate(active_report.remediation_actions, start=1):
+                    st.markdown(f"**{idx}.** {action}")
+
+        with tab_payload:
+            st.subheader("Serialized Audit Report (JSON)")
+            st.json(active_report.model_dump())
 
 
 if __name__ == "__main__":

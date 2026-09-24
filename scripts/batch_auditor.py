@@ -10,22 +10,21 @@ from __future__ import annotations
 import json
 import sys
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 # Ensure repository root is discoverable in sys.path
 ROOT_DIR = Path(__file__).resolve().parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from src.domain.enums import RiskTier
-from src.pipeline import FinGuardPipeline
+from src.pipeline import FinGuardPipeline  # noqa: E402
 
 
 def run_batch_regulatory_audit() -> None:
     """Executes multi-document compliance auditing across test corpus."""
     pipeline = FinGuardPipeline()
 
-    synthetic_corpus: Dict[str, str] = {
+    synthetic_corpus: dict[str, str] = {
         "Aura_Neural_Protocol_PPM.txt": (
             "AURA NEURAL PROTOCOL - CONFIDENTIAL OFFERING MEMORANDUM\n"
             "1. Capital Deployment & Target Yield:\n"
@@ -75,7 +74,7 @@ def run_batch_regulatory_audit() -> None:
     )
     print("-" * 105)
 
-    audit_records: List[Dict[str, Any]] = []
+    audit_records: list[dict[str, Any]] = []
 
     for doc_name, content in synthetic_corpus.items():
         report = pipeline.process_document(raw_text=content, file_name=doc_name)
@@ -113,7 +112,7 @@ def run_batch_regulatory_audit() -> None:
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(audit_records, f, indent=2)
 
-    print(f"\n[+] Batch compliance audit successfully executed.")
+    print("\n[+] Batch compliance audit successfully executed.")
     print(f"[+] Serialized JSON report generated at: {output_path.resolve()}\n")
 
 

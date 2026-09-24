@@ -50,7 +50,7 @@ REGULATORY_RULE_CATALOG: list[RegulatoryRule] = [
             r"(?i)\bno\s*trading\s*expertise\s*(?:is\s*)?required\b",
             r"(?i)\bpool(?:ed|ing)?\s*(?:of\s*)?(?:investor\s*)?(?:funds?|capital)\b",
             r"(?i)\b(?:allocate|allocating)\s*(?:digital\s*)?(?:funds?|capital|liquidity)\b",
-            r"(?i)\bhandled\s*entirely\s*by\s*our\b",
+            r"(?i)\bhandled\s*entirely\s*by\s*(?:our|the)\b",
             r"(?i)\bfully\s*managed\s*by\b",
             r"(?i)\befforts\s*of\s*(?:others|third\s*parties|promoters?|management)\b",
             r"(?i)\bderived\s*(?:solely\s*)?from\s*(?:the\s*)?efforts\s*of\b",
@@ -71,14 +71,13 @@ REGULATORY_RULE_CATALOG: list[RegulatoryRule] = [
         regulatory_framework=RegulatoryFramework.FTC_KOSCOT,
         weight=40,
         patterns=[
-            r"(?i)\bmulti-tier\s*(?:referral|affiliate|downline|commission)\b",
-            r"(?i)\bdownline(?:\s*investment)?(?:\s*volume)?\s*bonus(?:es)?\b",
+            # Resilient to intervening words: multi-tier [binary downline matching] bonuses
+            r"(?i)\b(?:multi[- ]tier|multi[- ]level|downline|upline)\s+(?:\w+\s+){0,3}(?:commission|bonus|compensation|structure|tree|reward|payout)s?\b",
+            r"(?i)\b(?:referral|recruitment)\s+(?:\w+\s+){0,2}(?:commission|bonus|incentive|override)s?\b",
+            r"(?i)\b(?:level\s+[1-9]\d*|tier\s+[1-9]\d*)\s+(?:\w+\s+){0,2}(?:commission|bonus|payout|return)s?\b",
+            r"(?i)\b(?:matching\s+bonus(?:es)?|generational\s+bonus(?:es)?)\b",
             r"(?i)\bmatching\s*(?:downline\s*)?referral\s*bonus\b",
-            r"(?i)\bbinary\s*(?:legs?|bonus|tree|matrix)\b",
-            r"(?i)\bcommission\s*on\s*level\s*\d+\s*downline\b",
-            r"(?i)\bmatching\s*bonus\s*across\s*(?:binary\s*legs|\d+\s*generations?)\b",
             r"(?i)\brecruited\s*capital\b",
-            r"(?i)\bgenerations?\s*(?:commission|matching\s*bonus)\b",
         ],
         remediation_advice=(
             "Abolish capital onboarding incentives under FTC Koscot mandates. Network compensations "
@@ -93,10 +92,12 @@ REGULATORY_RULE_CATALOG: list[RegulatoryRule] = [
         regulatory_framework=RegulatoryFramework.FTC_KOSCOT,
         weight=40,
         patterns=[
-            r"(?i)\brecruited\s*capital\s*incentive\b",
-            r"(?i)\bcommission\s*derived\s*from\s*investor\s*deposits\b",
-            r"(?i)\bdownline\s*capital\s*generation\b",
-            r"(?i)\bdownline(?:\s*investment)?(?:\s*volume)?\s*bonus(?:es)?\b",
+            # Resilient to binary downline, binary matching, leg balancing
+            r"(?i)\bbinary\s+(?:\w+\s+){0,2}(?:leg|matrix|tree|balancing|bonus|downline|structure)s?\b",
+            r"(?i)\b(?:weaker\s+leg|pay\s+leg|power\s+leg)\s+(?:\w+\s+){0,2}(?:volume|bonus|commission)s?\b",
+            r"(?i)\bdownline\s+(?:\w+\s+){0,2}(?:investment|capital|volume|generation)\b",
+            r"(?i)\bcommission\s+derived\s+from\s+investor\s+deposits\b",
+            r"(?i)\b(?:pyramid|ponzi)\s+(?:scheme|structure|mechanic)s?\b",
         ],
         remediation_advice="Decouple all participant compensation from downstream deposit volumes.",
     ),
@@ -123,9 +124,9 @@ REGULATORY_RULE_CATALOG: list[RegulatoryRule] = [
         regulatory_framework=RegulatoryFramework.FATF_HYIP,
         weight=40,
         patterns=[
-            r"(?i)\bdeposit\s*to\s*(?:anonymous|unhosted|personal)\s*(?:crypto\s*)?wallet\b",
-            r"(?i)\btransfer\s*funds?\s*to\s*(?:telegram|direct)\s*(?:admin|wallet|address)\b",
-            r"(?i)\bno\s*kyc\s*required\b",
+            r"(?i)\bdeposit\b.{0,40}?\b(?:anonymous|unhosted|personal)\s*(?:crypto\s*)?wallet\b",
+            r"(?i)\btransfer\s*(?:funds?|capital)?\s*to\s*(?:telegram|direct|anonymous)\s*(?:admin|wallet|address)\b",
+            r"(?i)\b(?:without|no)\s*kyc(?:\s*verification|\s*required)?\b",
             r"(?i)\broute\s*(?:payments?|capital)\s*through\s*unverified\s*escrow\b",
         ],
         remediation_advice=(

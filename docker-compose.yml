@@ -10,7 +10,7 @@ services:
       dockerfile: Dockerfile
     container_name: finguard-api-gateway
     restart: unless-stopped
-    command: ["uvicorn", "src.api.app:app", "--host", "0.0.0.0", "--port", "8000"]
+    command: ["uvicorn", "src.api.app:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]
     ports:
       - "8000:8000"
     environment:

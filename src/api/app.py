@@ -9,6 +9,7 @@ from fastapi import FastAPI, File, HTTPException, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.domain.models import AuditAssessmentReport, ContractAuditRequest
+from src.ingestion.normalizer import extract_text_from_pdf
 from src.pipeline import FinGuardPipeline
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
@@ -34,11 +35,7 @@ pipeline_instance = FinGuardPipeline()
 
 @app.get("/", tags=["Discovery"])
 def root() -> dict[str, Any]:
-    """Returns service discovery metadata, navigation endpoints, and documentation links.
-
-    Returns:
-        Dictionary containing service identity, operational status, and endpoint paths.
-    """
+    """Returns service discovery metadata, navigation endpoints, and documentation links."""
     return {
         "service": "FinGuard-AI Regulatory Gateway",
         "version": "1.0.0",
@@ -48,6 +45,7 @@ def root() -> dict[str, Any]:
             "health": "/health",
             "audit_text": "/api/v1/audit/text",
             "audit_file": "/api/v1/audit/file",
+            "analyze": "/analyze",
             "docs": "/docs",
         },
     }
@@ -55,11 +53,7 @@ def root() -> dict[str, Any]:
 
 @app.get("/health", tags=["Telemetry"])
 def health_check() -> dict[str, str]:
-    """Returns operational health telemetry status.
-
-    Returns:
-        Dictionary reporting service status, version, and identity.
-    """
+    """Returns operational health telemetry status."""
     return {
         "status": "healthy",
         "service": "FinGuard-AI Regulatory Gateway",
@@ -74,17 +68,7 @@ def health_check() -> dict[str, str]:
     tags=["Audit"],
 )
 def audit_text(request: ContractAuditRequest) -> AuditAssessmentReport:
-    """Analyzes raw contract text and returns a comprehensive regulatory audit report.
-
-    Args:
-        request: Inbound audit payload containing contract text.
-
-    Returns:
-        AuditAssessmentReport containing findings, risk vector, and suspicion score.
-
-    Raises:
-        HTTPException: If payload content is blank or contains only whitespace.
-    """
+    """Analyzes raw contract text and returns a comprehensive regulatory audit report."""
     if not request.content or not request.content.strip():
         logger.warning("audit_text_rejected: empty request content")
         raise HTTPException(
@@ -104,17 +88,7 @@ def audit_text(request: ContractAuditRequest) -> AuditAssessmentReport:
     tags=["Audit"],
 )
 def audit_file(file: UploadFile = File(...)) -> AuditAssessmentReport:
-    """Analyzes an uploaded plain text contract file.
-
-    Args:
-        file: Multi-part form file upload stream.
-
-    Returns:
-        AuditAssessmentReport containing compliance assessment findings.
-
-    Raises:
-        HTTPException: If file is missing a filename or contains an empty payload.
-    """
+    """Analyzes an uploaded contract document (PDF or TXT format)."""
     if not file.filename:
         logger.warning("audit_file_rejected: missing filename")
         raise HTTPException(
@@ -130,6 +104,37 @@ def audit_file(file: UploadFile = File(...)) -> AuditAssessmentReport:
             detail="Uploaded file content cannot be empty.",
         )
 
-    content = raw_bytes.decode("utf-8", errors="replace")
+    filename_lower = file.filename.lower()
+    if filename_lower.endswith(".pdf"):
+        try:
+            content = extract_text_from_pdf(raw_bytes)
+        except Exception as exc:
+            logger.error("pdf_extraction_failed: filename=%s error=%s", file.filename, str(exc))
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail=f"Failed to extract readable text from PDF: {exc}",
+            ) from exc
+    else:
+        content = raw_bytes.decode("utf-8", errors="replace")
+
+    if not content.strip():
+        logger.warning("audit_file_rejected: zero extractable text for %s", file.filename)
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail="Uploaded document contains zero extractable text.",
+        )
+
     logger.info("audit_file_started: filename=%s size=%d", file.filename, len(raw_bytes))
     return pipeline_instance.process_document(raw_text=content, file_name=file.filename)
+
+
+@app.post(
+    "/analyze",
+    response_model=AuditAssessmentReport,
+    status_code=status.HTTP_200_OK,
+    tags=["Audit"],
+    summary="Universal analysis endpoint accepting contract files (PDF or TXT)",
+)
+def analyze_endpoint(file: UploadFile = File(...)) -> AuditAssessmentReport:
+    """Universal analysis alias endpoint routing directly to file audit engine."""
+    return audit_file(file=file)
