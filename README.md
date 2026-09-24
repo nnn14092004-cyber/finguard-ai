@@ -289,7 +289,7 @@ pip install -r requirements.txt
 ```powershell
 .\.venv\Scripts\python.exe -m pytest -v --tb=short --cov=src tests/
 ```
-*Expected Result:* 29/29 tests passed in $< 1.0\text{s}$ with total coverage $\ge 83.45\%$.
+*Expected Result:* 29/29 tests passed with total coverage $\ge 83.45\%$ (exceeding institutional 80% benchmark in $\approx 1.0\text{s}$ under full bytecode instrumentation; $< 0.7\text{s}$ uninstrumented).
 
 ### Step 4: Execute Historical Case Studies Backtest Suite
 ```powershell
