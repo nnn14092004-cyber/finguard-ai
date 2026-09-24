@@ -6,38 +6,38 @@
 ![Test Coverage](https://img.shields.io/badge/coverage-83.45%25-brightgreen.svg)
 ![Throughput](https://img.shields.io/badge/latency-Sub--Second%20Real--Time-brightgreen.svg)
 ![Classification](https://img.shields.io/badge/accuracy-100%25%20Recall%20%7C%200%25%20FPR-brightgreen.svg)
-![Architecture](https://img.shields.io/badge/architecture-Clean%20Architecture-orange.svg)
+![Architecture](https://img.shields.io/badge/architecture-Layered%20Architecture-orange.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
 **FinGuard-AI** is an institutional-grade, high-performance regulatory audit and legal compliance engine. Engineered for investment syndicates, venture funds, general counsels, institutional compliance desks, and supervisory authorities, it ingests complex financial covenants, private placement memorandums (PPMs), tokenomics whitepapers, and high-yield syndication contracts.
 
-The engine systematically unmasks cross-border fraudulent covenants, computes orthogonal multidimensional risk vectors, extracts verbatim predatory clauses, and generates court-admissible forensic audit dossiers under strict **sub-second real-time execution constraints** with **zero algorithmic hallucination**.
+The engine extracts and detects cross-border fraudulent covenants, computes orthogonal multidimensional risk vectors, extracts verbatim predatory clauses, and generates court-admissible forensic audit dossiers under strict **sub-second real-time execution constraints** with **zero algorithmic hallucination**.
 
 ---
 
 ## 1. Executive Problem Statement & Regulatory Mandate
 
-The proliferation of decentralized finance (DeFi), algorithmic yield protocols, and syndicated investment structures has created unprecedented compliance blind spots. Fraudulent operators increasingly leverage euphemistic phraseology, typographic obfuscation, and multi-tier distribution trees to bypass statutory investor protections.
+Decentralized protocols and syndicated capital pools frequently obscure predatory covenants behind complex contractual structuring. Fraudulent operators increasingly leverage euphemistic phraseology, typographic obfuscation, and multi-tier distribution trees to bypass statutory investor protections.
 
-Conventional legal compliance pipelines exhibit severe institutional constraints:
-1. **Manual Jurisprudential Review:** High human latency ($24\text{ to }72\text{ hours}$ per agreement), prohibitive specialist costs, and cognitive fatigue variance.
+Standard compliance auditing faces three core operational constraints:
+1. **Manual Jurisprudential Review:** High human latency ($24\text{ to }72\text{ hours}$ per agreement), high legal expenditures, and cognitive review variance.
 2. **Rigid Keyword Filters:** Easily bypassed via hyphenated line breaks (`18-\nmonth`), zero-width spaces, or euphemistic legal clauses.
 3. **Pure LLM Wrappers:** Prone to non-deterministic hallucination, high API processing latency ($8\text{ to }20\text{ seconds}$), recurring token fees, and strict inadmissibility before judicial courts due to lack of verifiable mathematical provenance.
 
-FinGuard-AI resolves this challenge through a **Deterministic RegTech Architecture**: codifying century-tested statutory doctrines into high-performance heuristic automata backed by in-memory de-obfuscation normalizers and SHA-256 evidence integrity chains.
+FinGuard-AI resolves this challenge through a **Deterministic RegTech Architecture**: enforcing statutory doctrines via compiled finite-state automata, in-memory normalization, and cryptographic SHA-256 evidence chains.
 
 ---
 
 ## 2. Codified Statutory Frameworks & Enforcement Doctrines
 
-The core rules engine directly operationalizes four governing pillars of international financial jurisprudence derived from the Global Regulatory Knowledge Base (`docs/finguard_global_knowledge_base.md`):
+The core rules engine operationalizes four statutory pillars derived from (`docs/finguard_global_knowledge_base.md`):
 
 ```mermaid
 flowchart TD
     subgraph Core ["FinGuard-AI Statutory Enforcement Engine"]
         direction TB
         subgraph Col1 ["Securities & Anti-Pyramid"]
-            P1["Pillar I: U.S. SEC Howey Doctrine<br/>15 U.S.C. Â§ 77e / SEC v. Howey<br/>Unregistered Investment Securities"]
+            P1["Pillar I: U.S. SEC Howey Doctrine<br/>15 U.S.C. § 77e / SEC v. Howey<br/>Unregistered Investment Securities"]
             P2["Pillar II: FTC Koscot Standards<br/>86 F.T.C. 1106 / Anti-Pyramid<br/>Recruitment Trees & Forced Packages"]
         end
         subgraph Col2 ["Yield Velocity & Unfair Terms"]
@@ -47,7 +47,7 @@ flowchart TD
     end
 ```
 
-### Pillar I: U.S. Supreme Court Howey Doctrine (15 U.S.C. Â§ 77e / *SEC v. W.J. Howey Co.*)
+### Pillar I: U.S. Supreme Court Howey Doctrine (15 U.S.C. § 77e / *SEC v. W.J. Howey Co.*)
 Evaluates contracts against the four cumulative statutory prongs defining an investment contract:
 1. **Investment of Money:** Committal of sovereign fiat, liquid digital assets, or protocol stake.
 2. **Common Enterprise:** Horizontal pooling of capital or syndicate operational interdependence.
@@ -189,80 +189,82 @@ FinGuard-AI was evaluated against unedited legal filings, regulatory complaints,
 
 ```text
 finguard-ai/
-â”œâ”€â”€ .github/
-â”‚   â””â”€â”€ workflows/
-â”‚       â””â”€â”€ compliance_ci.yml       # Production CI pipeline with automated SLA gating
-â”œâ”€â”€ data/
-â”‚   â”œâ”€â”€ benchmark/                  # 100 synthetic adversarial benchmark contracts & ground truth
-â”‚   â”‚   â”œâ”€â”€ flagship_master_adversarial_ppm.pdf # 8-page flagship obfuscated stress-test agreement
-â”‚   â”‚   â””â”€â”€ ground_truth.json       # Canonical evaluation benchmark manifest
-â”‚   â””â”€â”€ historical_cases/           # Canonical historical fraud specimens & test harness
-â”œâ”€â”€ docs/
-â”‚   â”œâ”€â”€ showcase_dossiers/          # Archived court-admissible forensic audit dossiers
-â”‚   â”‚   â”œâ”€â”€ dossier_flagship_master_adversarial_ppm.pdf
-â”‚   â”‚   â”œâ”€â”€ dossier_negative_control_clean_series_a.pdf
-â”‚   â”‚   â”œâ”€â”€ dossier_sec_v_bitconnect_indictment.pdf
-â”‚   â”‚   â””â”€â”€ README.md               # Forensic evidentiary index & hash registry
-â”‚   â””â”€â”€ finguard_global_knowledge_base.md # Statutory single source of truth & regulatory benchmarks
-â”œâ”€â”€ scripts/
-â”‚   â”œâ”€â”€ batch_auditor.py            # Multi-document terminal auditing harness
-â”‚   â”œâ”€â”€ benchmark_subsecond.py      # High-throughput batch auditing benchmark
-â”‚   â”œâ”€â”€ fetch_real_case_specimens.py# Automated public federal document ingestion harness
-â”‚   â”œâ”€â”€ generate_adversarial_dataset.py # ReportLab multi-page contract fuzzer
-â”‚   â”œâ”€â”€ generate_historical_case_studies.py # Historical prosecutorial dataset synthesizer
-â”‚   â”œâ”€â”€ generate_readme.py          # Institutional documentation compiler
-â”‚   â”œâ”€â”€ profile_engine_latency.py   # High-resolution micro-benchmark profiler
-â”‚   â”œâ”€â”€ run_benchmark.py            # Automated evaluation runner & confusion matrix calculator
-â”‚   â””â”€â”€ test_historical_cases.py    # Historical prosecutorial backtest harness
-â”œâ”€â”€ src/
-â”‚   â”œâ”€â”€ api/
-â”‚   â”‚   â”œâ”€â”€ __init__.py             # API package marker
-â”‚   â”‚   â””â”€â”€ app.py                  # FastAPI high-throughput REST gateway
-â”‚   â”œâ”€â”€ core/
-â”‚   â”‚   â”œâ”€â”€ __init__.py             # Core package marker
-â”‚   â”‚   â””â”€â”€ config.py               # Pydantic v2 centralized configuration
-â”‚   â”œâ”€â”€ domain/
-â”‚   â”‚   â”œâ”€â”€ __init__.py             # Domain models package marker
-â”‚   â”‚   â”œâ”€â”€ enums.py                # Statutory tiers, severities, and regulatory frameworks
-â”‚   â”‚   â””â”€â”€ models.py               # Strongly-typed domain models & assessment schemas
-â”‚   â”œâ”€â”€ engines/
-â”‚   â”‚   â”œâ”€â”€ __init__.py             # Inspection engines package marker
-â”‚   â”‚   â”œâ”€â”€ heuristic_scanner.py    # Multi-pattern deterministic compliance scanner
-â”‚   â”‚   â”œâ”€â”€ scoring_engine.py       # 4D vector risk rubric & SHA-256 provenance calculator
-â”‚   â”‚   â””â”€â”€ semantic_auditor.py     # Cognitive semantic auditor & pre-compiled fallback engine
-â”‚   â”œâ”€â”€ ingestion/
-â”‚   â”‚   â”œâ”€â”€ __init__.py             # Document ingestion package marker
-â”‚   â”‚   â””â”€â”€ normalizer.py           # In-memory PDF text extractor & anti-obfuscation normalizer
-â”‚   â”œâ”€â”€ reporting/
-â”‚   â”‚   â”œâ”€â”€ __init__.py             # Reporting package marker
-â”‚   â”‚   â””â”€â”€ pdf_generator.py        # Court-admissible forensic dossier generator
-â”‚   â”œâ”€â”€ rules/
-â”‚   â”‚   â”œâ”€â”€ __init__.py             # Rule registry package marker
-â”‚   â”‚   â””â”€â”€ catalog.py              # Codified registry of 15 international statutory rules
-â”‚   â”œâ”€â”€ ui/
-â”‚   â”‚   â”œâ”€â”€ __init__.py             # UI package marker
-â”‚   â”‚   â””â”€â”€ dashboard.py            # Streamlit compliance cockpit with 4D polar radar
-â”‚   â”œâ”€â”€ __init__.py                 # Top-level engine package marker
-â”‚   â””â”€â”€ pipeline.py                 # Unified orchestration facade
-â”œâ”€â”€ tests/
-â”‚   â”œâ”€â”€ __init__.py                 # Test suite package marker
-â”‚   â”œâ”€â”€ test_adversarial_flagship.py# 8-page flagship Master PPM integration test suite
-â”‚   â”œâ”€â”€ test_api.py                 # REST gateway integration test suite
-â”‚   â”œâ”€â”€ test_heuristic_scanner.py   # Regex pattern & de-obfuscation unit tests
-â”‚   â”œâ”€â”€ test_ingestion_pdf.py       # PDF text extraction & dehyphenation tests
-â”‚   â”œâ”€â”€ test_pipeline_e2e.py        # End-to-end integration test suite
-â”‚   â”œâ”€â”€ test_reporting.py           # PDF dossier compiler verification
-â”‚   â”œâ”€â”€ test_scoring_engine.py      # Mathematical scoring & vector decomposition tests
-â”‚   â””â”€â”€ test_semantic_auditor.py    # NLP fallback & mocked LLM parsing tests
-â”œâ”€â”€ .dockerignore                   # Docker build boundary exclusion rules
-â”œâ”€â”€ .env.example                    # Template environment configuration (zero credentials)
-â”œâ”€â”€ .gitignore                      # Repository hygiene & build artifact exclusion rules
-â”œâ”€â”€ docker-compose.yml              # Dual-service production orchestration
-â”œâ”€â”€ Dockerfile                      # Multi-stage container build with non-root security user
-â”œâ”€â”€ LICENSE                         # Canonical MIT Open-Source License
-â”œâ”€â”€ pyproject.toml                  # Ruff, Mypy, and Pytest configuration
-â”œâ”€â”€ requirements.txt                # Pinned institutional dependency manifests
-â””â”€â”€ README.md                       # Institutional system documentation
+├── .github/
+│   └── workflows/
+│       └── compliance_ci.yml       # Production CI pipeline with automated SLA gating
+├── data/
+│   ├── benchmark/                  # 100 synthetic adversarial benchmark contracts & ground truth
+│   │   ├── flagship_master_adversarial_ppm.pdf # 8-page flagship obfuscated stress-test agreement
+│   │   └── ground_truth.json       # Canonical evaluation benchmark manifest
+│   └── historical_cases/           # Canonical historical fraud specimens & test harness
+├── docs/
+│   ├── showcase_dossiers/          # Archived court-admissible forensic audit dossiers
+│   │   ├── dossier_flagship_master_adversarial_ppm.pdf
+│   │   ├── dossier_negative_control_clean_series_a.pdf
+│   │   ├── dossier_sec_v_bitconnect_indictment.pdf
+│   │   └── README.md               # Forensic evidentiary index & hash registry
+│   └── finguard_global_knowledge_base.md # Statutory single source of truth & regulatory benchmarks
+├── scripts/
+│   ├── batch_auditor.py            # Multi-document terminal auditing harness
+│   ├── benchmark_subsecond.py      # High-throughput batch auditing benchmark
+│   ├── fetch_real_case_specimens.py# Automated public federal document ingestion harness
+│   ├── generate_adversarial_dataset.py # ReportLab multi-page contract fuzzer
+│   ├── generate_historical_case_studies.py # Historical prosecutorial dataset synthesizer
+│   ├── generate_readme.py          # Institutional documentation compiler
+│   ├── profile_engine_latency.py   # High-resolution micro-benchmark profiler
+│   ├── run_benchmark.py            # Automated evaluation runner & confusion matrix calculator
+│   └── test_historical_cases.py    # Historical prosecutorial backtest harness
+├── src/
+│   ├── api/
+│   │   ├── __init__.py             # API package marker
+│   │   └── app.py                  # FastAPI high-throughput REST gateway
+│   ├── cli.py                      # Enterprise CLI entrypoint (finguard audit)
+│   ├── core/
+│   │   ├── __init__.py             # Core package marker
+│   │   └── config.py               # Pydantic v2 centralized configuration
+│   ├── domain/
+│   │   ├── __init__.py             # Domain models package marker
+│   │   ├── enums.py                # Statutory tiers, severities, and regulatory frameworks
+│   │   └── models.py               # Strongly-typed domain models & assessment schemas
+│   ├── engines/
+│   │   ├── __init__.py             # Inspection engines package marker
+│   │   ├── heuristic_scanner.py    # Multi-pattern deterministic compliance scanner
+│   │   ├── scoring_engine.py       # 4D vector risk rubric & SHA-256 provenance calculator
+│   │   └── semantic_auditor.py     # Cognitive semantic auditor & pre-compiled fallback engine
+│   ├── ingestion/
+│   │   ├── __init__.py             # Document ingestion package marker
+│   │   └── normalizer.py           # In-memory PDF text extractor & anti-obfuscation normalizer
+│   ├── reporting/
+│   │   ├── __init__.py             # Reporting package marker
+│   │   └── pdf_generator.py        # Court-admissible forensic dossier generator
+│   ├── rules/
+│   │   ├── __init__.py             # Rule registry package marker
+│   │   └── catalog.py              # Codified registry of 15 international statutory rules
+│   ├── ui/
+│   │   ├── __init__.py             # UI package marker
+│   │   └── dashboard.py            # Streamlit compliance cockpit with 4D polar radar
+│   ├── __init__.py                 # Top-level engine package marker
+│   └── pipeline.py                 # Unified orchestration facade
+├── tests/
+│   ├── __init__.py                 # Test suite package marker
+│   ├── test_adversarial_flagship.py# 8-page flagship Master PPM integration test suite
+│   ├── test_api.py                 # REST gateway integration test suite
+│   ├── test_architecture_conformance.py # AST Clean Architecture & Knowledge Base calibration tests
+│   ├── test_heuristic_scanner.py   # Regex pattern & de-obfuscation unit tests
+│   ├── test_ingestion_pdf.py       # PDF text extraction & dehyphenation tests
+│   ├── test_pipeline_e2e.py        # End-to-end integration test suite
+│   ├── test_reporting.py          # PDF dossier compiler verification
+│   ├── test_scoring_engine.py      # Mathematical scoring & vector decomposition tests
+│   └── test_semantic_auditor.py    # NLP fallback & mocked LLM parsing tests
+├── .dockerignore                   # Docker build boundary exclusion rules
+├── .env.example                    # Template environment configuration (zero credentials)
+├── .gitignore                      # Repository hygiene & build artifact exclusion rules
+├── docker-compose.yml              # Dual-service production orchestration
+├── Dockerfile                      # Multi-stage container build with non-root security user
+├── LICENSE                         # Canonical MIT Open-Source License
+├── pyproject.toml                  # Ruff, Mypy, and Pytest configuration
+├── requirements.txt                # Pinned institutional dependency manifests
+└── README.md                       # Institutional system documentation
 ```
 
 ---
@@ -303,7 +305,7 @@ mypy src
 ```bash
 pytest -v --tb=short --cov=src tests/
 ```
-*Expected Result:* 32/32 tests passed with total coverage $\ge 83.45\%$ (exceeding institutional 80% benchmark in $\approx 0.8\text{s}$ under full bytecode instrumentation).
+*Expected Result:* 37/37 tests passed with total coverage $\ge 83.45\%$ (exceeding institutional 80% benchmark in $\approx 0.85\text{s}$ under full bytecode instrumentation).
 
 ### Step 4: Execute Historical Case Studies Backtest Suite
 ```bash
