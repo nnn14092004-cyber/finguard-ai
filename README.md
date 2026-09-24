@@ -264,68 +264,73 @@ finguard-ai/
 ### Prerequisites
 * Python 3.11 or 3.12
 * Docker Desktop (Required for containerized deployment)
-* PowerShell (Windows) or Bash (Linux / macOS)
+* Shell environment: PowerShell (Windows) or Terminal / Bash / Zsh (Linux / macOS)
 
 ### Step 1: Environment Setup & Library Installation
-```powershell
-# Create and activate virtual environment
+```bash
+# 1. Create isolated virtual environment
 python -m venv .venv
-.\.venv\Scripts\Activate.ps1
 
-# Install pinned dependencies
+# 2. Activate virtual environment
+# On Windows (PowerShell):
+.\.venv\Scripts\Activate.ps1
+# On Linux / macOS (Bash/Zsh):
+source .venv/bin/activate
+
+# 3. Install pinned production & development dependencies
 pip install -r requirements.txt
 ```
 
 ### Step 2: Code Hygiene & Strict Static Typing Verification
-```powershell
-# Lint and format inspection
-.\.venv\Scripts\python.exe -m ruff check src tests
-.\.venv\Scripts\python.exe -m ruff format --check src tests
+```bash
+# Linting and style formatting verification
+ruff check src tests
+ruff format --check src tests
 
 # Strict static type verification
-.\.venv\Scripts\python.exe -m mypy src
+mypy src
 ```
 
 ### Step 3: Execute Statutory Test Suite
-```powershell
-.\.venv\Scripts\python.exe -m pytest -v --tb=short --cov=src tests/
+```bash
+pytest -v --tb=short --cov=src tests/
 ```
 *Expected Result:* 29/29 tests passed with total coverage $\ge 83.45\%$ (exceeding institutional 80% benchmark in $\approx 1.0\text{s}$ under full bytecode instrumentation; $< 0.7\text{s}$ uninstrumented).
 
 ### Step 4: Execute Historical Case Studies Backtest Suite
-```powershell
+```bash
 # Synthesize historical cases if not already present
-.\.venv\Scripts\python.exe scripts/generate_historical_case_studies.py
+python scripts/generate_historical_case_studies.py
 
-# Execute historical benchmark harness
-.\.venv\Scripts\python.exe scripts/test_historical_cases.py
+# Execute historical prosecutorial benchmark harness
+python scripts/test_historical_cases.py
 ```
 *Expected Result:* 5/5 historical benchmarks validated with 100% regulatory accuracy.
 
 ### Step 5: Execute 100-PDF Adversarial Benchmark
-```powershell
-.\.venv\Scripts\python.exe scripts/generate_adversarial_dataset.py
-.\.venv\Scripts\python.exe scripts/run_benchmark.py
+```bash
+python scripts/generate_adversarial_dataset.py
+python scripts/run_benchmark.py
 ```
 *Expected Result:* Evaluates 100 PDFs, confirming Recall: 100.0%, Precision: 100.0%, FPR: 0.0%.
 
 ### Step 6: Launch Production Microservices
 
 #### Mode A: Standalone Bare-Metal
-```powershell
+```bash
 # Tab 1: Launch FastAPI Gateway (@Port 8000)
-.\.venv\Scripts\python.exe -m uvicorn src.api.app:app --host 127.0.0.1 --port 8000 --reload
+uvicorn src.api.app:app --host 127.0.0.1 --port 8000 --reload
 # -> Interactive Swagger UI : http://127.0.0.1:8000/docs
 # -> Service Discovery JSON : http://127.0.0.1:8000/
 # -> Alternative ReDoc      : http://127.0.0.1:8000/redoc
 
 # Tab 2: Launch Streamlit Compliance Cockpit (@Port 8501)
-.\.venv\Scripts\python.exe -m streamlit run src/ui/dashboard.py --server.port 8501
+streamlit run src/ui/dashboard.py --server.port 8501
 # -> Executive Cockpit UI   : http://127.0.0.1:8501
 ```
 
 #### Mode B: Production Docker Compose
-```powershell
+```bash
 docker compose build --no-cache
 docker compose up -d
 docker compose ps

@@ -271,68 +271,73 @@ finguard-ai/
 ### Prerequisites
 * Python 3.11 or 3.12
 * Docker Desktop (Required for containerized deployment)
-* PowerShell (Windows) or Bash (Linux / macOS)
+* Shell environment: PowerShell (Windows) or Terminal / Bash / Zsh (Linux / macOS)
 
 ### Step 1: Environment Setup & Library Installation
-<TICK_PS>
-# Create and activate virtual environment
+<TICK_BASH>
+# 1. Create isolated virtual environment
 python -m venv .venv
-.\.venv\Scripts\Activate.ps1
 
-# Install pinned dependencies
+# 2. Activate virtual environment
+# On Windows (PowerShell):
+.\.venv\Scripts\Activate.ps1
+# On Linux / macOS (Bash/Zsh):
+source .venv/bin/activate
+
+# 3. Install pinned production & development dependencies
 pip install -r requirements.txt
 <TICK>
 
 ### Step 2: Code Hygiene & Strict Static Typing Verification
-<TICK_PS>
-# Lint and format inspection
-.\.venv\Scripts\python.exe -m ruff check src tests
-.\.venv\Scripts\python.exe -m ruff format --check src tests
+<TICK_BASH>
+# Linting and style formatting verification
+ruff check src tests
+ruff format --check src tests
 
 # Strict static type verification
-.\.venv\Scripts\python.exe -m mypy src
+mypy src
 <TICK>
 
 ### Step 3: Execute Statutory Test Suite
-<TICK_PS>
-.\.venv\Scripts\python.exe -m pytest -v --tb=short --cov=src tests/
+<TICK_BASH>
+pytest -v --tb=short --cov=src tests/
 <TICK>
 *Expected Result:* 29/29 tests passed with total coverage $\ge 83.45\%$ (exceeding institutional 80% benchmark in $\approx 1.0\text{s}$ under full bytecode instrumentation; $< 0.7\text{s}$ uninstrumented).
 
 ### Step 4: Execute Historical Case Studies Backtest Suite
-<TICK_PS>
+<TICK_BASH>
 # Synthesize historical cases if not already present
-.\.venv\Scripts\python.exe scripts/generate_historical_case_studies.py
+python scripts/generate_historical_case_studies.py
 
-# Execute historical benchmark harness
-.\.venv\Scripts\python.exe scripts/test_historical_cases.py
+# Execute historical prosecutorial benchmark harness
+python scripts/test_historical_cases.py
 <TICK>
 *Expected Result:* 5/5 historical benchmarks validated with 100% regulatory accuracy.
 
 ### Step 5: Execute 100-PDF Adversarial Benchmark
-<TICK_PS>
-.\.venv\Scripts\python.exe scripts/generate_adversarial_dataset.py
-.\.venv\Scripts\python.exe scripts/run_benchmark.py
+<TICK_BASH>
+python scripts/generate_adversarial_dataset.py
+python scripts/run_benchmark.py
 <TICK>
 *Expected Result:* Evaluates 100 PDFs, confirming Recall: 100.0%, Precision: 100.0%, FPR: 0.0%.
 
 ### Step 6: Launch Production Microservices
 
 #### Mode A: Standalone Bare-Metal
-<TICK_PS>
+<TICK_BASH>
 # Tab 1: Launch FastAPI Gateway (@Port 8000)
-.\.venv\Scripts\python.exe -m uvicorn src.api.app:app --host 127.0.0.1 --port 8000 --reload
+uvicorn src.api.app:app --host 127.0.0.1 --port 8000 --reload
 # -> Interactive Swagger UI : http://127.0.0.1:8000/docs
 # -> Service Discovery JSON : http://127.0.0.1:8000/
 # -> Alternative ReDoc      : http://127.0.0.1:8000/redoc
 
 # Tab 2: Launch Streamlit Compliance Cockpit (@Port 8501)
-.\.venv\Scripts\python.exe -m streamlit run src/ui/dashboard.py --server.port 8501
+streamlit run src/ui/dashboard.py --server.port 8501
 # -> Executive Cockpit UI   : http://127.0.0.1:8501
 <TICK>
 
 #### Mode B: Production Docker Compose
-<TICK_PS>
+<TICK_BASH>
 docker compose build --no-cache
 docker compose up -d
 docker compose ps
@@ -372,7 +377,7 @@ def main() -> None:
     final_content = (
         RAW_TEMPLATE.replace("<TICK_MERMAID>", tick + "mermaid")
         .replace("<TICK_TEXT>", tick + "text")
-        .replace("<TICK_PS>", tick + "powershell")
+        .replace("<TICK_BASH>", tick + "bash")
         .replace("<TICK>", tick)
         .strip()
         + "\n"
@@ -383,7 +388,7 @@ def main() -> None:
 
     lines = len(readme_path.read_text(encoding="utf-8").splitlines())
     print(f"SUCCESS: Institutional README.md re-compiled cleanly at {readme_path}")
-    print(f"Total Lines Written: {lines} lines (Enterprise Repositioning & Governance Complete).")
+    print(f"Total Lines Written: {lines} lines (Universal Cross-Platform Standard Complete).")
 
 
 if __name__ == "__main__":
