@@ -314,9 +314,13 @@ pip install -r requirements.txt
 ```powershell
 # Tab 1: Launch FastAPI Gateway (@Port 8000)
 .\.venv\Scripts\python.exe -m uvicorn src.api.app:app --host 127.0.0.1 --port 8000 --reload
+# -> Interactive Swagger UI : http://127.0.0.1:8000/docs
+# -> Service Discovery JSON : http://127.0.0.1:8000/
+# -> Alternative ReDoc      : http://127.0.0.1:8000/redoc
 
 # Tab 2: Launch Streamlit Compliance Cockpit (@Port 8501)
 .\.venv\Scripts\python.exe -m streamlit run src/ui/dashboard.py --server.port 8501
+# -> Executive Cockpit UI   : http://127.0.0.1:8501
 ```
 
 #### Mode B: Production Docker Compose
@@ -324,6 +328,8 @@ pip install -r requirements.txt
 docker compose build --no-cache
 docker compose up -d
 docker compose ps
+# -> Access Cockpit UI at: http://127.0.0.1:8501
+# -> Access Swagger UI at: http://127.0.0.1:8000/docs
 ```
 
 ---
