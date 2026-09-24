@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-# Using raw string (r"") to preserve backslashes for KaTeX math and formatting
+# Using raw string template with balanced HTML line breaks for GitHub SVG rendering
 RAW_TEMPLATE = r"""# FinGuard-AI: Institutional Contract Compliance & Regulatory Audit Pipeline
 
 [![Compliance CI](https://github.com/nnn14092004-cyber/finguard-ai/actions/workflows/compliance_ci.yml/badge.svg)](https://github.com/nnn14092004-cyber/finguard-ai/actions)
@@ -34,10 +34,10 @@ The inspection core directly references and enforces four governing pillars of i
 <TICK_MERMAID>
 flowchart TD
     subgraph Regulatory_Pillars [FinGuard-AI Statutory Enforcement Core]
-        P1["1. SEC Howey Doctrine (15 U.S.C. § 77e)\nUnregistered Securities & Passive Managerial Reliance"]
-        P2["2. FTC Koscot & Amway Standards\nPyramid Architecture & Downline Recruitment Bonuses"]
-        P3["3. FATF & FCA High-Yield Standards\nDaily/Monthly Velocity, Capital Guarantees & AML Evasion"]
-        P4["4. Unfair Contract Terms & Jurisdiction Evasion\nExtortionate Lockups, 40% Exit Penalties & Secrecy Havens"]
+        P1["<b>1. SEC Howey Doctrine</b><br/>15 U.S.C. § 77e<br/>Unregistered Securities & Passive Reliance"]
+        P2["<b>2. FTC Koscot & Amway Standards</b><br/>Pyramid Architecture & Downline Bonuses"]
+        P3["<b>3. FATF & FCA High-Yield Standards</b><br/>Velocity, Capital Guarantees & AML Evasion"]
+        P4["<b>4. Unfair Contract Terms & Jurisdiction</b><br/>Lockups, Exit Penalties & Secrecy Havens"]
     end
 <TICK>
 
@@ -93,7 +93,7 @@ Where:
 
 In addition to the scalar score, FinGuard-AI decomposes contractual exposure into an orthogonal four-dimensional risk vector:
 
-$$\mathbf{R} = \begin{bmatrix} R_{\text{yield}} \\ R_{\text{structural}} \\ R_{\text{liquidity}} \\ R_{\text{legal}} \end{bmatrix} \in [0, 100]^4$$
+$$\mathbf{R} = [R_{\text{yield}}, R_{\text{structural}}, R_{\text{liquidity}}, R_{\text{legal}}] \in [0, 100]^4$$
 
 * **Yield Velocity Risk ($R_{\text{yield}}$):** Measures claims of absolute capital guarantees and daily/monthly yields decoupled from risk-free benchmarks.
 * **Structural / MLM Risk ($R_{\text{structural}}$):** Measures passive pooling under Howey Prong 4 and multi-tier downline referral commission trees.
@@ -109,17 +109,17 @@ FinGuard-AI follows Clean Architecture and Domain-Driven Design (DDD) principles
 <TICK_MERMAID>
 flowchart TD
     subgraph Ingestion_Layer [1. Document Ingestion & Anti-Obfuscation]
-        RAW["Raw Input\n(Plain Text, Markdown, PDF Streams)"]
-        PYPDF["In-Memory pypdf Extractor\n(Zero Disk I/O)"]
-        NORM["TextNormalizer\n(Unicode NFKC, Dehyphenation, Soft Line-Wrap Normalization)"]
+        RAW["Raw Input Streams<br/>(Plain Text, Markdown, PDF)"]
+        PYPDF["In-Memory pypdf Extractor<br/>(Zero Disk I/O)"]
+        NORM["TextNormalizer Automaton<br/>(Unicode NFKC & Dehyphenation)"]
         RAW --> PYPDF --> NORM
     end
 
     subgraph Core_Engine [2. Deterministic & Cognitive Inspection Core]
         PIPE["FinGuardPipeline Facade"]
-        HEUR["HeuristicScanner\n(Pre-Compiled Regex Automata, 15 Rules)"]
-        SEM["SemanticAuditor\n(LLM Analysis & Cached Fallback Automata)"]
-        SCORE["ScoringEngine\n(Mathematical Vector Synthesis & SHA-256 Provenance)"]
+        HEUR["HeuristicScanner<br/>(15 Codified Statutory Rules)"]
+        SEM["SemanticAuditor<br/>(LLM & Fallback Automata)"]
+        SCORE["ScoringEngine<br/>(4D Vector & SHA-256 Provenance)"]
         
         NORM --> PIPE
         PIPE --> HEUR & SEM
@@ -127,10 +127,10 @@ flowchart TD
     end
 
     subgraph Delivery_Tier [3. Institutional Delivery & Presentation]
-        REP["AuditAssessmentReport\n(Risk Tier, 4D Vector, Verbatim Evidence)"]
-        API["FastAPI Gateway Engine\n(/api/v1/audit/text & /file & /analyze)"]
-        UI["Streamlit Compliance Cockpit\n(4D Polar Radar Chart)"]
-        PDF["ReportLab Forensic Dossier\n(Court-Admissible PDF Export)"]
+        REP["AuditAssessmentReport<br/>(Risk Tier & Verbatim Evidence)"]
+        API["FastAPI Gateway Engine<br/>(/api/v1/audit/text & /file)"]
+        UI["Streamlit Compliance Cockpit<br/>(4D Polar Radar Chart)"]
+        PDF["ReportLab Forensic Dossier<br/>(Court-Admissible Export)"]
         
         SCORE --> REP
         REP --> API & UI & PDF
@@ -289,8 +289,8 @@ def main() -> None:
     readme_path.write_text(final_content, encoding="utf-8")
 
     lines = len(readme_path.read_text(encoding="utf-8").splitlines())
-    print(f"SUCCESS: Institutional README.md compiled cleanly at {readme_path}")
-    print(f"Total Lines Written: {lines} lines (Full Enterprise Specification).")
+    print(f"SUCCESS: Institutional README.md re-compiled cleanly at {readme_path}")
+    print(f"Total Lines Written: {lines} lines (Visual & KaTeX Perfection).")
 
 
 if __name__ == "__main__":
