@@ -81,3 +81,7 @@ benchmark_results.json
 data/benchmark/*.pdf
 data/benchmark/ground_truth.json
 !data/**/.gitkeep
+# Test & Benchmark Artifacts
+benchmark_results.json
+.coverage
+

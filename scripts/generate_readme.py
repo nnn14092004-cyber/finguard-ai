@@ -4,401 +4,219 @@ from __future__ import annotations
 
 from pathlib import Path
 
-RAW_TEMPLATE = r"""# FinGuard-AI: Institutional Contract Compliance & Regulatory Audit Engine
-
-[![Compliance CI](https://github.com/nnn14092004-cyber/finguard-ai/actions/workflows/compliance_ci.yml/badge.svg)](https://github.com/nnn14092004-cyber/finguard-ai/actions)
-![Python Version](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue.svg)
-![Test Suite](https://img.shields.io/badge/tests-37%2F37%20passing-brightgreen.svg)
-![Test Coverage](https://img.shields.io/badge/coverage-83.45%25-brightgreen.svg)
-![Throughput](https://img.shields.io/badge/latency-Sub--Second%20Real--Time-brightgreen.svg)
-![Classification](https://img.shields.io/badge/accuracy-100%25%20Recall%20%7C%200%25%20FPR-brightgreen.svg)
-![Architecture](https://img.shields.io/badge/architecture-Layered%20Architecture-orange.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
-
-**FinGuard-AI** is an institutional-grade, high-performance regulatory audit and legal compliance engine. Engineered for investment syndicates, venture funds, general counsels, institutional compliance desks, and supervisory authorities, it ingests complex financial covenants, private placement memorandums (PPMs), tokenomics whitepapers, and high-yield syndication contracts.
-
-The engine extracts and detects cross-border fraudulent covenants, computes orthogonal multidimensional risk vectors, extracts verbatim predatory clauses, and generates court-admissible forensic audit dossiers under strict **sub-second real-time execution constraints** with **zero algorithmic hallucination**.
-
----
-
-## 1. Executive Problem Statement & Regulatory Mandate
-
-Decentralized protocols and syndicated capital pools frequently obscure predatory covenants behind complex contractual structuring. Fraudulent operators increasingly leverage euphemistic phraseology, typographic obfuscation, and multi-tier distribution trees to bypass statutory investor protections.
-
-Standard compliance auditing faces three core operational constraints:
-1. **Manual Jurisprudential Review:** High human latency ($24\text{ to }72\text{ hours}$ per agreement), high legal expenditures, and cognitive review variance.
-2. **Rigid Keyword Filters:** Easily bypassed via hyphenated line breaks (`18-\nmonth`), zero-width spaces, or euphemistic legal clauses.
-3. **Pure LLM Wrappers:** Prone to non-deterministic hallucination, high API processing latency ($8\text{ to }20\text{ seconds}$), recurring token fees, and strict inadmissibility before judicial courts due to lack of verifiable mathematical provenance.
-
-FinGuard-AI resolves this challenge through a **Deterministic RegTech Architecture**: enforcing statutory doctrines via compiled finite-state automata, in-memory normalization, and cryptographic SHA-256 evidence chains.
-
----
-
-## 2. Codified Statutory Frameworks & Enforcement Doctrines
-
-The core rules engine operationalizes four statutory pillars derived from (`docs/finguard_global_knowledge_base.md`):
-
-<TICK_MERMAID>
-flowchart TD
-    subgraph Core ["FinGuard-AI Statutory Enforcement Engine"]
-        direction TB
-        subgraph Col1 ["Securities & Anti-Pyramid"]
-            P1["Pillar I: U.S. SEC Howey Doctrine<br/>15 U.S.C. § 77e / SEC v. Howey<br/>Unregistered Investment Securities"]
-            P2["Pillar II: FTC Koscot Standards<br/>86 F.T.C. 1106 / Anti-Pyramid<br/>Recruitment Trees & Forced Packages"]
-        end
-        subgraph Col2 ["Yield Velocity & Unfair Terms"]
-            P3["Pillar III: FATF & FCA Standards<br/>HYIP Yield Decoupling<br/>AML & Travel Rule Circumvention"]
-            P4["Pillar IV: UDAAP & Unfair Terms<br/>Predatory Capital Lockups<br/>Offshore Jurisdictional Evasion"]
-        end
-    end
-<TICK>
-
-### Pillar I: U.S. Supreme Court Howey Doctrine (15 U.S.C. § 77e / *SEC v. W.J. Howey Co.*)
-Evaluates contracts against the four cumulative statutory prongs defining an investment contract:
-1. **Investment of Money:** Committal of sovereign fiat, liquid digital assets, or protocol stake.
-2. **Common Enterprise:** Horizontal pooling of capital or syndicate operational interdependence.
-3. **Expectation of Profits:** Promised yields, dividends, algorithmic arbitrage returns, or capital appreciation.
-4. **Solely from the Efforts of Others:** Return generation executed entirely by promoters, quantitative algorithms, or centralized managers where participants remain passive (`HOWEY-001`).
-
-### Pillar II: FTC Koscot & IOSCO Anti-Pyramid Standards (*In re Koscot Interplanetary, Inc.*)
-Identifies illegitimate multi-level recruitment pyramids masquerading as commercial enterprises:
-* Compensation derived primarily from onboarding new participant capital rather than verifiable retail product consumption (`MLM-001`, `PYRAMID-001`).
-* Binary leg balancing mechanisms, power-leg volume matching bonuses, and multi-tier generational overrides resilient to intervening token distances.
-* Mandatory internal package purchases ("Starter Nodes", "VIP Licenses") as statutory prerequisites for yield accrual (`PYRAMID-002`).
-
-### Pillar III: FATF & FCA High-Yield Investment Fraud (HYIP) & AML Standards
-Enforces sovereign risk-free rate decoupling constraints and cross-border anti-money laundering mandates:
-* Returns fundamentally detached from macroeconomic risk-free benchmarks (e.g., fixed daily returns of $0.5\%\text{ to }2.5\%$ or monthly yields exceeding $15\%\text{ to }30\%$) (`HYIP-001`).
-* Pervasive psychological insulation covenants ("100% Capital Guaranteed", "Zero-Risk Protocol", "Principal Protection Vault") (`TECH-001`).
-* FATF Recommendation 16 (Travel Rule) evasion: Mandatory routing of investor liquidity through anonymous personal wallets or Telegram bots without verified institutional escrow (`AML-001`).
-
-### Pillar IV: Cross-Border Unfair Terms & UDAAP Statutory Violations
-Neutralizes unconscionable contractual adhesion covenants and jurisdiction laundering:
-* Mandatory capital freezing intervals exceeding 12 to 36 months for basic liquidity pools (`LOCK-001`).
-* Punitive early liquidation penalties forfeiting $30\%\text{ to }100\%$ of deposited principal (`LOCK-002`).
-* Unilateral discretionary covenant alteration rights without advance electronic notice or bilateral consent (`UNFAIR-001`).
-* Blanket fiduciary and tort liability disclaimers absolving issuers of all losses from exploits or insolvency (`UNFAIR-002`).
-* Forum evasion routing disputes to non-cooperative offshore secrecy havens (e.g., Vanuatu, Seychelles, Cayman Islands, BVI) (`JUR-001`, `UNFAIR-004`).
-
----
-
-## 3. Mathematical Scoring Rubric & Risk Decomposition
-
-The engine synthesizes flagged statutory infractions into an aggregate scalar **Suspicion Score ($S$)**, strictly bounded within the closed interval $[0, 100]$:
-
-$$S = \min\left(100, \max\left(0, \sum_{i=1}^{N} w_i \cdot c_i\right)\right)$$
-
-Where:
-* $w_i \in \{10, 20, 40\}$: Statutory penalty weight assigned to codified rule $i$.
-* $c_i \in \{0, 1\}$: Binary occurrence coefficient (deduplicated by distinct `rule_id`).
-
-### Regulatory Risk Tiers
-
-| Tier Name | Score Range ($S$) | Institutional & Regulatory Enforcement Disposition |
-| :--- | :---: | :--- |
-| **GREEN** | $0 \le S < 25$ | **Standard Commercial Baseline:** Negligible risk markers. Contract conforms strictly with standard venture or commercial contracting practices. |
-| **YELLOW** | $25 \le S < 50$ | **Cautionary Review Required:** Non-standard covenants flagged. Mandatory legal review prior to institutional execution. |
-| **ORANGE** | $50 \le S < 75$ | **High Regulatory Suspicion:** Predatory mechanisms identified (excessive lockups, offshore secrecy venues, unilateral modifications). |
-| **RED FLAG** | $75 \le S \le 100$ | **Critical Regulatory Hazard:** Confirmed unregistered investment syndicate, Ponzi mechanics, or illegal pyramid recruitment architecture. |
-
-### Orthogonal Four-Dimensional Risk Vector Space
-
-To prevent information loss inherent in single scalar metrics, FinGuard-AI decomposes exposure into an orthogonal four-dimensional vector:
-
-$$\mathbf{R} = [R_{\text{yield}}, R_{\text{structural}}, R_{\text{liquidity}}, R_{\text{legal}}] \in [0, 100]^4$$
-
-* **Yield Velocity Risk ($R_{\text{yield}}$):** Evaluates claims of absolute capital protection and yield decoupling from risk-free rates.
-* **Structural / MLM Risk ($R_{\text{structural}}$):** Quantifies Howey Prong 4 passive managerial reliance and multi-tier recruitment commission trees.
-* **Liquidity Lockup Risk ($R_{\text{liquidity}}$):** Measures capital freezing intervals and predatory early liquidation penalties.
-* **Legal Jurisdiction Risk ($R_{\text{legal}}$):** Measures unilateral amendment rights, blanket liability waivers, and offshore forum laundering.
-
----
-
-## 4. End-to-End Clean Architecture
-
-FinGuard-AI is organized according to Clean Architecture principles, ensuring strict separation of concerns across ingestion, heuristic inspection, cognitive fallback auditing, and presentation layers:
-
-<TICK_MERMAID>
-flowchart TD
-    subgraph Ingestion_Tier [1. Ingestion & Pre-Processing Tier]
-        RAW["Raw Ingestion Streams<br/>(Plain Text, Markdown, PDF)"]
-        PYPDF["In-Memory pypdf Extractor<br/>(Zero Disk I/O Footprint)"]
-        NORM["TextNormalizer Automaton<br/>(Unicode NFKC & Cross-Line Dehyphenation)"]
-        RAW --> PYPDF --> NORM
-    end
-
-    subgraph Inspection_Core [2. Deterministic & Cognitive Engine Core]
-        PIPE["FinGuardPipeline Facade"]
-        HEUR["HeuristicScanner<br/>(15 Codified Statutory Rules)"]
-        SEM["SemanticAuditor<br/>(Cognitive Fallback Engine)"]
-        SCORE["ScoringEngine<br/>(4D Vector & SHA-256 Provenance)"]
-        
-        NORM --> PIPE
-        PIPE --> HEUR & SEM
-        HEUR & SEM --> SCORE
-    end
-
-    subgraph Delivery_Tier [3. Institutional Delivery & Presentation]
-        REP["AuditAssessmentReport Schema<br/>(Pydantic v2 Immutable Contract)"]
-        API["FastAPI REST Gateway<br/>(/api/v1/audit/text & /file)"]
-        UI["Streamlit Executive Cockpit<br/>(4D Polar Radar & Forensic UI)"]
-        PDF["ForensicReportGenerator<br/>(Court-Admissible Dossier Export)"]
-        
-        SCORE --> REP
-        REP --> API & UI & PDF
-    end
-<TICK>
-
----
-
-## 5. Empirical Performance & Case Study Validation
-
-### 5.1 Adversarial Stress-Test Benchmark (100 PDF Corpus)
-
-FinGuard-AI was evaluated against an adversarial benchmark of 100 multi-page agreements (`data/benchmark/`). Predatory clauses were embedded within authentic corporate boilerplate text with deliberate obfuscation tactics (e.g., cross-line word hyphens, spacing manipulations):
-
-| Performance Metric | Measured Value | Benchmark Target | Operational Status |
-| :--- | :---: | :---: | :---: |
-| **Recall (Trap Sensitivity)** | **100.00% (80 / 80)** | $\ge 95.00\%$ | **TARGET EXCEEDED (PERFECT RECALL)** |
-| **Precision** | **100.00% (80 / 80)** | $\ge 98.00\%$ | **PERFECT PRECISION** |
-| **False Positive Rate (FPR)** | **0.00% (0 / 20)** | $\le 2.00\%$ | **ZERO FALSE POSITIVES** |
-| **F1 Score** | **1.000** | $\ge 0.965$ | **OPTIMAL CLASSIFICATION BALANCE** |
-| **Document Processing SLA** | **< 1.00s / document** | $< 2.00\text{s}$ | **SUB-SECOND REAL-TIME AUDITING** |
-| **Total Benchmark Time** | **0.65 seconds (100 PDFs)** | $< 30.00\text{ seconds}$ | **HIGH-THROUGHPUT BATCH INSPECTION** |
-
-### 5.2 Real-Time SLA & High-Throughput Verification
-
-Profiling was conducted across repeated document evaluation cycles spanning high-yield Ponzi covenants, unregistered securities PPMs, Series A preferred shares, and cloud SLAs:
-
-| System Attribute | Operational Delivery | Architectural Advantage |
-| :--- | :---: | :--- |
-| **Execution Latency SLA** | **Sub-Second Guaranteed** | Deterministic Regex Automata running locally |
-| **Throughput Capacity** | **Enterprise Batch Capable** | High-density parallel screening without network overhead |
-| **Algorithmic Hallucination** | **0.00% (Zero)** | Rule-based mathematical certainty over stochastic guessing |
-| **Compute Cost per Audit** | **$0.00 (Self-Contained)** | Eliminates external LLM token metering |
-| **Network Contention** | **Zero Network I/O** | Fully air-gapped on-premise execution ready |
-
-### 5.3 Real-World Judicial & Prosecutorial Backtest Corpus
-
-FinGuard-AI was evaluated against unedited legal filings, regulatory complaints, and landmark jurisprudence from sovereign agencies:
-
-| Case Specimen Identifier | Historical Enforcement Context | Core Violations Flagged | Processing SLA | Suspicion Score | Regulatory Audit Verdict |
-| :--- | :--- | :--- | :---: | :---: | :---: |
-| **SEC v. BitConnect (2021)**<br/>`comp-pr2021-172.pdf` (44 Pages) | U.S. SEC Federal Action ($2.4B Ponzi/Lending Fraud) | 18 Determinations: 1% daily HYIP, Howey Prong 4, 7-Tier referral trees | **0.38s** | **100 / 100** | **CRITICAL RED FLAG**<br/>(18 Deterministic Infractions) |
-| **FTC v. Amway Corp. (1979)**<br/>`93 F.T.C. 618` (120 Pages, 9.3 MB) | Landmark FTC Anticompetitive & Multi-Tier Jurisprudence | 6 Determinations: Performance bonus schedules, geometric circle trees | **0.36s** | **80 / 100** | **CRITICAL RED FLAG**<br/>(Yield=70, Structural=40, Lockup=0) |
-| **Flagship Master Adversarial PPM**<br/>`flagship_master_adversarial_ppm.pdf` (8 Pages) | Synthetic Multi-Layer Adversarial Obfuscation Specimen | 21 Determinations: Saturated 4D vector space across all 4 pillars | **0.41s** | **100 / 100** | **CRITICAL RED FLAG**<br/>(Yield=100, Struct=80, Lock=60, Jur=40) |
-| **Series A Preferred Stock Agreement**<br/>`clean_control_001.pdf` (3 Pages) | NVCA Commercial Standard (Venture Capital Control) | 0 Flags: Founder vesting cliff, Delaware forum, bilateral consents | **0.08s** | **0 / 100** | **GREEN BASELINE**<br/>(0% False Positive Rate) |
-
----
-
-## 6. Comprehensive Project Directory Layout
-
-<TICK_TEXT>
-finguard-ai/
-├── .github/
-│   └── workflows/
-│       └── compliance_ci.yml       # Production CI pipeline with automated SLA gating
-├── data/
-│   ├── benchmark/                  # 100 synthetic adversarial benchmark contracts & ground truth
-│   │   ├── flagship_master_adversarial_ppm.pdf # 8-page flagship obfuscated stress-test agreement
-│   │   └── ground_truth.json       # Canonical evaluation benchmark manifest
-│   └── historical_cases/           # Canonical historical fraud specimens & test harness
-├── docs/
-│   ├── showcase_dossiers/          # Archived court-admissible forensic audit dossiers
-│   │   ├── dossier_flagship_master_adversarial_ppm.pdf
-│   │   ├── dossier_negative_control_clean_series_a.pdf
-│   │   ├── dossier_sec_v_bitconnect_indictment.pdf
-│   │   └── README.md               # Forensic evidentiary index & hash registry
-│   └── finguard_global_knowledge_base.md # Statutory single source of truth & regulatory benchmarks
-├── scripts/
-│   ├── batch_auditor.py            # Multi-document terminal auditing harness
-│   ├── benchmark_subsecond.py      # High-throughput batch auditing benchmark
-│   ├── fetch_real_case_specimens.py# Automated public federal document ingestion harness
-│   ├── generate_adversarial_dataset.py # ReportLab multi-page contract fuzzer
-│   ├── generate_historical_case_studies.py # Historical prosecutorial dataset synthesizer
-│   ├── generate_readme.py          # Institutional documentation compiler
-│   ├── profile_engine_latency.py   # High-resolution micro-benchmark profiler
-│   ├── run_benchmark.py            # Automated evaluation runner & confusion matrix calculator
-│   └── test_historical_cases.py    # Historical prosecutorial backtest harness
-├── src/
-│   ├── api/
-│   │   ├── __init__.py             # API package marker
-│   │   └── app.py                  # FastAPI high-throughput REST gateway
-│   ├── cli.py                      # Enterprise CLI entrypoint (finguard audit)
-│   ├── core/
-│   │   ├── __init__.py             # Core package marker
-│   │   └── config.py               # Pydantic v2 centralized configuration
-│   ├── domain/
-│   │   ├── __init__.py             # Domain models package marker
-│   │   ├── enums.py                # Statutory tiers, severities, and regulatory frameworks
-│   │   └── models.py               # Strongly-typed domain models & assessment schemas
-│   ├── engines/
-│   │   ├── __init__.py             # Inspection engines package marker
-│   │   ├── heuristic_scanner.py    # Multi-pattern deterministic compliance scanner
-│   │   ├── scoring_engine.py       # 4D vector risk rubric & SHA-256 provenance calculator
-│   │   └── semantic_auditor.py     # Cognitive semantic auditor & pre-compiled fallback engine
-│   ├── ingestion/
-│   │   ├── __init__.py             # Document ingestion package marker
-│   │   └── normalizer.py           # In-memory PDF text extractor & anti-obfuscation normalizer
-│   ├── reporting/
-│   │   ├── __init__.py             # Reporting package marker
-│   │   └── pdf_generator.py        # Court-admissible forensic dossier generator
-│   ├── rules/
-│   │   ├── __init__.py             # Rule registry package marker
-│   │   └── catalog.py              # Codified registry of 15 international statutory rules
-│   ├── ui/
-│   │   ├── __init__.py             # UI package marker
-│   │   └── dashboard.py            # Streamlit compliance cockpit with 4D polar radar
-│   ├── __init__.py                 # Top-level engine package marker
-│   └── pipeline.py                 # Unified orchestration facade
-├── tests/
-│   ├── __init__.py                 # Test suite package marker
-│   ├── test_adversarial_flagship.py# 8-page flagship Master PPM integration test suite
-│   ├── test_api.py                 # REST gateway integration test suite
-│   ├── test_architecture_conformance.py # AST Clean Architecture & Knowledge Base calibration tests
-│   ├── test_heuristic_scanner.py   # Regex pattern & de-obfuscation unit tests
-│   ├── test_ingestion_pdf.py       # PDF text extraction & dehyphenation tests
-│   ├── test_pipeline_e2e.py        # End-to-end integration test suite
-│   ├── test_reporting.py          # PDF dossier compiler verification
-│   ├── test_scoring_engine.py      # Mathematical scoring & vector decomposition tests
-│   └── test_semantic_auditor.py    # NLP fallback & mocked LLM parsing tests
-├── .dockerignore                   # Docker build boundary exclusion rules
-├── .env.example                    # Template environment configuration (zero credentials)
-├── .gitignore                      # Repository hygiene & build artifact exclusion rules
-├── docker-compose.yml              # Dual-service production orchestration
-├── Dockerfile                      # Multi-stage container build with non-root security user
-├── LICENSE                         # Canonical MIT Open-Source License
-├── pyproject.toml                  # Ruff, Mypy, and Pytest configuration
-├── requirements.txt                # Pinned institutional dependency manifests
-└── README.md                       # Institutional system documentation
-<TICK>
-
----
-
-## 7. Verification Runbook & Quickstart
-
-### Prerequisites
-* Python 3.11 or 3.12
-* Docker Desktop (Required for containerized deployment)
-* Shell environment: PowerShell (Windows) or Terminal / Bash / Zsh (Linux / macOS)
-
-### Step 1: Environment Setup & Library Installation
-<TICK_BASH>
-# 1. Create isolated virtual environment
-python -m venv .venv
-
-# 2. Activate virtual environment
-# On Windows (PowerShell):
-.\.venv\Scripts\Activate.ps1
-# On Linux / macOS (Bash/Zsh):
-source .venv/bin/activate
-
-# 3. Install pinned production & development dependencies
-pip install -r requirements.txt
-<TICK>
-
-### Step 2: Code Hygiene & Strict Static Typing Verification
-<TICK_BASH>
-# Linting and style formatting verification
-ruff check src tests
-ruff format --check src tests
-
-# Strict static type verification
-mypy src
-<TICK>
-
-### Step 3: Execute Statutory Test Suite
-<TICK_BASH>
-pytest -v --tb=short --cov=src tests/
-<TICK>
-*Expected Result:* 37/37 tests passed with total coverage $\ge 83.45\%$ (exceeding institutional 80% benchmark in $\approx 0.85\text{s}$ under full bytecode instrumentation).
-
-### Step 4: Execute Historical Case Studies Backtest Suite
-<TICK_BASH>
-# Synthesize historical cases if not already present
-python scripts/generate_historical_case_studies.py
-
-# Execute historical prosecutorial benchmark harness
-python scripts/test_historical_cases.py
-<TICK>
-*Expected Result:* Canonical historical benchmarks validated with 100% regulatory accuracy.
-
-### Step 5: Execute 100-PDF Adversarial Benchmark
-<TICK_BASH>
-python scripts/generate_adversarial_dataset.py
-python scripts/run_benchmark.py
-<TICK>
-*Expected Result:* Evaluates 100 PDFs, confirming Recall: 100.0%, Precision: 100.0%, FPR: 0.0%.
-
-### Step 6: Launch Production Microservices
-
-#### Mode A: Standalone Bare-Metal
-<TICK_BASH>
-# Tab 1: Launch FastAPI Gateway (@Port 8000)
-uvicorn src.api.app:app --host 127.0.0.1 --port 8000 --reload
-# -> Interactive Swagger UI : http://127.0.0.1:8000/docs
-# -> Service Discovery JSON : http://127.0.0.1:8000/
-# -> Alternative ReDoc      : http://127.0.0.1:8000/redoc
-
-# Tab 2: Launch Streamlit Compliance Cockpit (@Port 8501)
-streamlit run src/ui/dashboard.py --server.port 8501
-# -> Executive Cockpit UI   : http://127.0.0.1:8501
-<TICK>
-
-#### Mode B: Production Docker Compose
-<TICK_BASH>
-docker compose build --no-cache
-docker compose up -d
-docker compose ps
-# -> Access Cockpit UI at: http://127.0.0.1:8501
-# -> Access Swagger UI at: http://127.0.0.1:8000/docs
-<TICK>
-
----
-
-## 8. Cryptographic Integrity & Regulatory Evidentiary Standards
-
-FinGuard-AI is engineered in compliance with **Federal Rules of Evidence Rule 902(13) and Rule 902(14)** governing certified records generated by electronic processes:
-* **Deterministic Cryptographic Hashing:** Every ingested agreement stream is subjected to single-pass SHA-256 hashing during the normalization phase prior to heuristic parsing.
-* **Tamper-Evident Dossier Provenance:** The resulting SHA-256 digest is permanently stamped into the `AuditAssessmentReport` metadata and rendered verbatim onto the header and footer of generated PDF dossiers.
-* **Non-Repudiation Assurance:** Modifying a single character within an audited agreement irrevocably invalidates the mathematical proof of audit, ensuring forensic integrity for sovereign enforcement authorities.
-* **Verified Evidentiary Archive:** Pre-compiled court-admissible dossiers verifying landmark regulatory enforcements are maintained under `docs/showcase_dossiers/`.
-
----
-
-## 9. Engineering Philosophy & AI Governance
-
-FinGuard-AI adheres to strict institutional software engineering principles regarding artificial intelligence:
-* **Anti-Hallucination Mandate:** High-stakes financial and legal compliance cannot rely on probabilistic next-token predictors. The primary regulatory audit hot path is strictly deterministic, executing compiled finite-state automata with zero risk of cognitive confabulation.
-* **Pragmatic AI Acceleration:** Modern engineering tooling and AI assistants were leveraged strictly as execution accelerators for boilerplate syntax and adversarial data fuzzing. All domain modeling, regulatory mappings (SEC, FTC, FATF, UDAAP), mathematical risk rubrics, and architectural boundaries were manually architected and empirically verified via rigorous unit testing (83.45% coverage).
-* **Defensive Clean Architecture:** Decoupled layered design ensures that cognitive NLP fallback components remain auxiliary, preventing runtime non-determinism from corrupting core statutory evaluations.
-
----
-
-## 10. License & Statutory Disclaimers
-
-Distributed under the MIT License. FinGuard-AI is engineered exclusively for institutional financial compliance auditing, risk underwriting, and academic legal research. It does not constitute formal statutory legal representation or sovereign prosecutorial declarations.
-"""
+# Construct backtick fence tokens dynamically to prevent Markdown code-block collision
+B3 = chr(96) * 3
+
+
+def build_readme_content() -> str:
+    """Compiles the verified technical documentation matching the institutional specification."""
+    parts = [
+        "# FinGuard-AI: Regulatory Contract Audit Engine\n\n",
+        "[![tests](https://img.shields.io/badge/tests-37%2F37%20passing-brightgreen)](https://github.com/nnn14092004-cyber/finguard-ai/actions)\n",
+        "[![coverage](https://img.shields.io/badge/coverage-83.86%25-brightgreen)](https://github.com/nnn14092004-cyber/finguard-ai)\n",
+        "[![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)\n\n",
+        "FinGuard-AI reads financial contracts, PPMs, and syndication agreements and\n",
+        "flags patterns tied to unregistered securities, Ponzi/MLM structuring, and\n",
+        "predatory yield terms. It's meant as a fast first-pass triage before a document\n",
+        "reaches a compliance officer or outside counsel -- not a replacement for\n",
+        "either.\n\n",
+        "The core motivation: manual review is slow (hours to days per agreement) and\n",
+        "keyword filters are trivially bypassed with things like cross-line hyphenation\n",
+        "or euphemistic phrasing. FinGuard-AI leans on a deterministic rule engine\n",
+        "first, with a semantic layer as fallback, rather than routing everything\n",
+        "through an LLM that could hallucinate a finding with no way to audit why.\n\n",
+        "## 1. What it checks for\n\n",
+        "The rule catalog covers four areas, each mapped to a real regulatory\n",
+        "framework:\n\n",
+        "* **Howey Doctrine (15 U.S.C. §77e / SEC v. Howey)** -- the four-prong test for\n",
+        "  an unregistered investment contract: investment of money, common enterprise,\n",
+        "  expectation of profit, and profit derived from a third party's effort.\n",
+        "* **FTC Koscot / anti-pyramid standards** -- compensation structures driven by\n",
+        "  recruiting new participants rather than a real product, binary/matrix\n",
+        "  bonuses, mandatory \"starter package\" purchases.\n",
+        "* **FATF/FCA HYIP & AML standards** -- yields decoupled from any real\n",
+        "  risk-free rate, \"100% guaranteed / zero risk\" language, and routing investor\n",
+        "  funds through unverified wallets or bots (a Travel Rule red flag).\n",
+        "* **Cross-border unfair terms / UDAAP** -- long capital lockups, punitive\n",
+        "  early-withdrawal penalties, unilateral contract amendment rights, and\n",
+        "  offshore forum-shopping to non-cooperative jurisdictions.\n\n",
+        "## 2. Scoring\n\n",
+        "Findings roll up into a single Suspicion Score (0-100), plus a 4D risk vector\n",
+        "so a single number doesn't hide *why* something scored high:\n\n",
+        "* **Yield Velocity Risk** -- unsustainable/guaranteed-return claims\n",
+        "* **Structural / MLM Risk** -- recruitment-driven compensation\n",
+        "* **Liquidity Lockup Risk** -- withdrawal restrictions, redemption gates\n",
+        "* **Legal Jurisdiction Risk** -- unilateral terms, offshore forum evasion\n\n",
+        "| Tier | Score | Meaning |\n",
+        "|---|---|---|\n",
+        "| GREEN | 0-24 | Standard commercial contract, no material flags |\n",
+        "| YELLOW | 25-49 | Non-standard covenants, worth a legal look |\n",
+        "| ORANGE | 50-74 | Predatory patterns present (lockups, offshore venues, unilateral terms) |\n",
+        "| RED | 75-100 | Strong indicators of an unregistered security, Ponzi structure, or pyramid |\n\n",
+        "## 3. Architecture\n\n",
+        "Three layers, kept deliberately decoupled so a non-deterministic component\n",
+        "(the semantic fallback) can never corrupt a deterministic one:\n\n",
+        f"{B3}text\n",
+        "1. Ingestion\n",
+        "   Raw text / PDF -> pypdf extraction (in-memory) -> Unicode NFKC\n",
+        "   normalization + cross-line dehyphenation\n\n",
+        "2. Inspection core\n",
+        "   HeuristicScanner (15 codified regex rules, deterministic)\n",
+        "       + SemanticAuditor (LLM fallback for phrasing the regex misses)\n",
+        "   -> ScoringEngine (4D vector + SHA-256 provenance hash)\n\n",
+        "3. Delivery\n",
+        "   AuditAssessmentReport (Pydantic schema)\n",
+        "       -> FastAPI REST endpoint (/api/v1/audit/text, /file)\n",
+        "       -> Streamlit dashboard (radar chart + summary)\n",
+        "       -> PDF dossier export\n",
+        f"{B3}\n\n",
+        "Every ingested document gets SHA-256 hashed at normalization time, and that\n",
+        "hash gets stamped into the report metadata and the PDF dossier header/footer --\n",
+        "so if the source text changes even slightly, the audit no longer matches. That\n",
+        "part is a design property, not a legal certification; see Section 7 for what\n",
+        "this doesn't claim.\n\n",
+        "## 4. What I've actually measured\n\n",
+        "Everything below is from real runs on my dev machine\n",
+        "(`scripts/run_final_acceptance.py`, which chains all of these), not\n",
+        "invented numbers. Full raw output, including per-file results, is in\n",
+        "`benchmark_results.json` after running the benchmark yourself.\n\n",
+        "### 4.1 Test suite\n\n",
+        "37/37 tests passing, 83.86% coverage (`pytest --cov=src`). Also passing:\n",
+        "`ruff check`, `ruff format --check`, and `mypy --strict` across the whole\n",
+        "`src/` tree.\n\n",
+        "### 4.2 100-document adversarial benchmark\n\n",
+        "Run against a synthetic corpus the project generates itself\n",
+        "(`data/benchmark/`) -- 80 documents with predatory clauses deliberately\n",
+        "embedded in realistic boilerplate (including obfuscation like cross-line\n",
+        "hyphens), and 20 clean commercial contracts as negative controls:\n\n",
+        "| Metric | Result |\n",
+        "|---|---|\n",
+        "| True Positives | 80 / 80 |\n",
+        "| True Negatives | 20 / 20 |\n",
+        "| False Positives | 0 / 20 |\n",
+        "| False Negatives | 0 / 80 |\n",
+        "| Recall | 100.00% |\n",
+        "| Precision | 100.00% |\n",
+        "| Average latency / doc | 6.87 ms |\n",
+        "| P95 latency | 7.60 ms |\n",
+        "| Total time (100 docs) | 0.69 s |\n\n",
+        "Worth being upfront about what this does and doesn't prove: it's a perfect\n",
+        "score on a benchmark the project itself generated, with known patterns it was\n",
+        "built to catch. It's a solid regression check, not independent third-party\n",
+        "validation. If a document uses obfuscation this rule set wasn't designed for,\n",
+        "this benchmark won't tell you that.\n\n",
+        "### 4.3 Historical case backtest\n\n",
+        "Five real, publicly documented cases run through `test_historical_cases.py`:\n\n",
+        "| Case | Expected | Result | Score | Latency | Rules triggered |\n",
+        "|---|---|---|---|---|---|\n",
+        "| BitConnect | RED | RED | 100/100 | 2.99 ms | 8 (AML-001, HOWEY-001, HYIP-001, LOCK-001, LOCK-002, MLM-001, PYR-001, PYRAMID-001) |\n",
+        "| ZeekRewards | RED | RED | 100/100 | 1.85 ms | 5 |\n",
+        "| Madoff / BLMIS | RED | RED | 80/100 | 1.73 ms | 3 |\n",
+        "| Anchor Protocol / Terra | RED | RED | 100/100 | 1.71 ms | 5 |\n",
+        "| NVCA Series A (clean control) | GREEN | GREEN | 0/100 | 2.18 ms | 0 |\n\n",
+        "All 5 matched their expected tier. Note: the BitConnect numbers here (2.99ms,\n",
+        "8 rule categories) come from this backtest script, which is different from\n",
+        "the interactive Streamlit dashboard run shown elsewhere in this repo's\n",
+        "history (7.27ms, 23 flagged occurrences) -- the dashboard adds its own UI\n",
+        "overhead and counts individual rule *occurrences* rather than distinct rule\n",
+        "*categories*. Same underlying engine, two different measurement contexts.\n\n",
+        "### 4.4 Component-level latency\n\n",
+        "From `profile_engine_latency.py`:\n\n",
+        "| Component | p50 | p95 | p99 |\n",
+        "|---|---|---|---|\n",
+        "| TextNormalizer | 0.066 ms | 0.081 ms | 0.113 ms |\n",
+        "| HeuristicScanner (15 rules) | 0.472 ms | 0.723 ms | 0.891 ms |\n",
+        "| ScoringEngine | 0.010 ms | 0.010 ms | 0.013 ms |\n",
+        "| PDF dossier generation | 24.4 ms | 32.0 ms | 35.8 ms |\n",
+        "| Full pipeline (E2E) | 0.609 ms | 0.786 ms | 0.974 ms |\n\n",
+        "The PDF export is the slow part by a wide margin (ReportLab rendering), but\n",
+        "it's not on the audit hot path -- scoring itself finishes in under a\n",
+        "millisecond.\n\n",
+        "## 5. Setup\n\n",
+        f"{B3}bash\n",
+        "python -m venv .venv\n",
+        "# Windows:\n",
+        ".\\.venv\\Scripts\\Activate.ps1\n",
+        "# Linux / macOS:\n",
+        "source .venv/bin/activate\n\n",
+        "pip install -r requirements.txt\n",
+        f"{B3}\n\n",
+        "Run everything at once:\n",
+        f"{B3}bash\n",
+        "python scripts/run_final_acceptance.py\n",
+        f"{B3}\n",
+        "This chains lint + type-check + pytest + historical backtest + 100-doc\n",
+        "benchmark + latency profiling. Takes about 20-25 seconds on my machine.\n\n",
+        "Or run pieces individually:\n",
+        f"{B3}bash\n",
+        "pytest -v --tb=short --cov=src tests/\n",
+        "python scripts/test_historical_cases.py\n",
+        "python scripts/run_benchmark.py\n",
+        "python scripts/profile_engine_latency.py\n",
+        f"{B3}\n\n",
+        "Launch the services:\n",
+        f"{B3}bash\n",
+        "# Terminal 1 -- API\n",
+        "uvicorn src.api.app:app --host 127.0.0.1 --port 8000 --reload\n",
+        "# http://127.0.0.1:8000/docs\n\n",
+        "# Terminal 2 -- dashboard\n",
+        "streamlit run src/ui/dashboard.py --server.port 8501\n",
+        "# http://127.0.0.1:8501\n",
+        f"{B3}\n\n",
+        "Or via Docker:\n",
+        f"{B3}bash\n",
+        "docker compose build --no-cache\n",
+        "docker compose up -d\n",
+        f"{B3}\n\n",
+        "## 6. Project layout\n\n",
+        f"{B3}text\n",
+        "finguard-ai/\n",
+        "├── data/benchmark/          synthetic adversarial test corpus + ground truth\n",
+        "├── data/historical_cases/   real fraud case documents used in backtesting\n",
+        "├── docs/                    regulatory knowledge base, sample dossiers\n",
+        "├── scripts/                 test runners, benchmark generators, acceptance harness\n",
+        "├── src/\n",
+        "│   ├── api/                 FastAPI gateway\n",
+        "│   ├── domain/               models, enums\n",
+        "│   ├── engines/              heuristic scanner, semantic auditor, scoring engine\n",
+        "│   ├── ingestion/            PDF extraction + normalization\n",
+        "│   ├── reporting/            PDF dossier generator\n",
+        "│   ├── rules/                the 15-rule catalog\n",
+        "│   ├── ui/                   Streamlit dashboard\n",
+        "│   └── pipeline.py           orchestration facade\n",
+        "└── tests/\n",
+        f"{B3}\n\n",
+        "## 7. What this doesn't claim\n\n",
+        "This is a working prototype, tested against its own benchmark and a small set\n",
+        "of historical cases -- not an audited compliance product, and not a\n",
+        "substitute for legal review. It hasn't been reviewed by anyone outside this\n",
+        "project, and the 100% recall/precision numbers above are against a\n",
+        "self-generated benchmark, not an independent one. The SHA-256 provenance\n",
+        "hashing is a real, useful integrity property (any edit to the source\n",
+        "document invalidates the hash), but calling a PDF \"court-admissible\" is a\n",
+        "legal determination for a court to make, not something software can assert\n",
+        "about itself.\n\n",
+        "## Roadmap\n\n",
+        "- [ ] Independent/adversarial benchmark built by someone other than the\n",
+        "      project author\n",
+        "- [ ] Expand the historical case corpus beyond 5 cases\n",
+        "- [ ] Third-party review of the rule catalog against current case law\n",
+        "- [ ] Confidence intervals or explainability output alongside the raw score\n\n",
+        "## License\n\n",
+        "MIT\n",
+    ]
+    return "".join(parts)
 
 
 def main() -> None:
-    """Generates the institutional README.md by resolving markdown tokens."""
-    tick = chr(96) * 3
-    final_content = (
-        RAW_TEMPLATE.replace("<TICK_MERMAID>", tick + "mermaid")
-        .replace("<TICK_TEXT>", tick + "text")
-        .replace("<TICK_BASH>", tick + "bash")
-        .replace("<TICK>", tick)
-        .strip()
-        + "\n"
-    )
+    """Compiles the verified technical README.md at the project repository root."""
+    target_readme_path = Path(__file__).resolve().parent.parent / "README.md"
+    readme_content = build_readme_content()
+    target_readme_path.write_text(readme_content, encoding="utf-8")
 
-    readme_path = Path(__file__).resolve().parent.parent / "README.md"
-    readme_path.write_text(final_content, encoding="utf-8")
-
-    lines = len(readme_path.read_text(encoding="utf-8").splitlines())
-    print(f"SUCCESS: Institutional README.md re-compiled cleanly at {readme_path}")
-    print(f"Total Lines Written: {lines} lines (Unicode Directory Tree Restored).")
+    total_lines = len(target_readme_path.read_text(encoding="utf-8").splitlines())
+    print(f"[+] SUCCESS: Exact README.md compiled cleanly at: {target_readme_path}")
+    print(f"[+] Total Lines Written: {total_lines} lines (Exact match with linked badges).")
 
 
 if __name__ == "__main__":
