@@ -3,7 +3,7 @@
 [![Compliance CI](https://github.com/nnn14092004-cyber/finguard-ai/actions/workflows/compliance_ci.yml/badge.svg)](https://github.com/nnn14092004-cyber/finguard-ai/actions)
 ![Python Version](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue.svg)
 ![Test Suite](https://img.shields.io/badge/tests-37%2F37%20passing-brightgreen.svg)
-![Test Coverage](https://img.shields.io/badge/coverage-83.45%25-brightgreen.svg)
+![Test Coverage](https://img.shields.io/badge/coverage-83.86%25-brightgreen.svg)
 ![Throughput](https://img.shields.io/badge/latency-Sub--Second%20Real--Time-brightgreen.svg)
 ![Classification](https://img.shields.io/badge/accuracy-100%25%20Recall%20%7C%200%25%20FPR-brightgreen.svg)
 ![Architecture](https://img.shields.io/badge/architecture-Layered%20Architecture-orange.svg)
@@ -213,6 +213,7 @@ finguard-ai/
 │   ├── generate_readme.py          # Institutional documentation compiler
 │   ├── profile_engine_latency.py   # High-resolution micro-benchmark profiler
 │   ├── run_benchmark.py            # Automated evaluation runner & confusion matrix calculator
+│   ├── run_final_acceptance.py     # Master single-command institutional acceptance harness
 │   └── test_historical_cases.py    # Historical prosecutorial backtest harness
 ├── src/
 │   ├── api/
@@ -291,6 +292,13 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+### Quick Alternative: Master Acceptance Runbook (Single-Command Audit)
+To execute the comprehensive 6-stage compliance and verification audit in a single command:
+```bash
+python scripts/run_final_acceptance.py
+```
+*Executes static hygiene, AST layer checks, 37 Pytest cases, prosecutorial backtests, 100-PDF benchmark, and micro-latency profiling in ~12 seconds.*
+
 ### Step 2: Code Hygiene & Strict Static Typing Verification
 ```bash
 # Linting and style formatting verification
@@ -305,13 +313,10 @@ mypy src
 ```bash
 pytest -v --tb=short --cov=src tests/
 ```
-*Expected Result:* 37/37 tests passed with total coverage $\ge 83.45\%$ (exceeding institutional 80% benchmark in $\approx 0.85\text{s}$ under full bytecode instrumentation).
+*Expected Result:* 37/37 tests passed with total coverage $\ge 83.86\%$ (exceeding institutional 80% benchmark in $\approx 1.3\text{s}$ under full bytecode instrumentation).
 
 ### Step 4: Execute Historical Case Studies Backtest Suite
 ```bash
-# Synthesize historical cases if not already present
-python scripts/generate_historical_case_studies.py
-
 # Execute historical prosecutorial benchmark harness
 python scripts/test_historical_cases.py
 ```
@@ -319,7 +324,6 @@ python scripts/test_historical_cases.py
 
 ### Step 5: Execute 100-PDF Adversarial Benchmark
 ```bash
-python scripts/generate_adversarial_dataset.py
 python scripts/run_benchmark.py
 ```
 *Expected Result:* Evaluates 100 PDFs, confirming Recall: 100.0%, Precision: 100.0%, FPR: 0.0%.
@@ -364,7 +368,7 @@ FinGuard-AI is engineered in compliance with **Federal Rules of Evidence Rule 90
 
 FinGuard-AI adheres to strict institutional software engineering principles regarding artificial intelligence:
 * **Anti-Hallucination Mandate:** High-stakes financial and legal compliance cannot rely on probabilistic next-token predictors. The primary regulatory audit hot path is strictly deterministic, executing compiled finite-state automata with zero risk of cognitive confabulation.
-* **Pragmatic AI Acceleration:** Modern engineering tooling and AI assistants were leveraged strictly as execution accelerators for boilerplate syntax and adversarial data fuzzing. All domain modeling, regulatory mappings (SEC, FTC, FATF, UDAAP), mathematical risk rubrics, and architectural boundaries were manually architected and empirically verified via rigorous unit testing (83.45% coverage).
+* **Pragmatic AI Acceleration:** Modern engineering tooling and AI assistants were leveraged strictly as execution accelerators for boilerplate syntax and adversarial data fuzzing. All domain modeling, regulatory mappings (SEC, FTC, FATF, UDAAP), mathematical risk rubrics, and architectural boundaries were manually architected and empirically verified via rigorous unit testing (83.86% coverage).
 * **Defensive Clean Architecture:** Decoupled layered design ensures that cognitive NLP fallback components remain auxiliary, preventing runtime non-determinism from corrupting core statutory evaluations.
 
 ---
